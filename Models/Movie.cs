@@ -180,7 +180,7 @@
             return MoviesList;
         }
 
-        public List<Movie> GetByTitle(string title)
+        static public List<Movie> GetByTitle(string title)
         {
             List<Movie> movies = new List<Movie>();
             foreach (Movie movie in MoviesList)
@@ -193,7 +193,7 @@
             return movies;
         }
 
-        public List<Movie> GetByReleaseDate(DateTime startDate, DateTime endDate)
+        static public List<Movie> GetByReleaseDate(DateTime startDate, DateTime endDate)
         {
             List<Movie> movies = new List<Movie>();
             foreach (Movie movie in MoviesList)

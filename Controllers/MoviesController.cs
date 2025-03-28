@@ -29,21 +29,36 @@ namespace ServerSide_HW.Controllers
             Movie movie5 = new Movie(5, "www.movie5.com", "Movie 5", "Description 5", "image5.jpg", 2017, new DateTime(2017, 5, 5), "German", 5000000, 9000000, "Sci-Fi, Fantasy", false, 160, 8.5f, 5000);
 
             movies.Add(movie1);
+            movie1.insert();
+
             movies.Add(movie2);
             movies.Add(movie3);
             movies.Add(movie4);
             movies.Add(movie5);
-
+            movie2.insert();
+            movie3.insert();
+            movie4.insert();
+            movie5.insert();
+            movies = Movie.Read();
             return movies;
         }
 
         // GET api/<MoviesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("(title)")]
+        public List<Movie> GetByTitle(string title)
         {
-            return "value";
+            List<Movie> filterdMovies = Movie.GetByTitle(title);
+            return filterdMovies;
         }
 
+
+        // GET api/<MoviesController>/5
+        [HttpGet("GetByReleaseDate/startDate/{startDate}/endDate/{endDate}")]
+        public List<Movie> GetByReleaseDate(DateTime startDate,DateTime endDate)
+        {
+            List<Movie> filterdMovies = Movie.GetByReleaseDate(startDate, endDate);
+            return filterdMovies;
+        }
         // POST api/<MoviesController>
         [HttpPost]
         public void Post([FromBody] string value)
