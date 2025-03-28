@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\GOD\\source\\repos\\serverSide-HW\\ServerSide-HW.csproj": {}
+    "C:\\Users\\GOD\\source\\repos\\ServerSide-HW\\ServerSide-HW.csproj": {}
   },
   "projects": {
-    "C:\\Users\\GOD\\source\\repos\\serverSide-HW\\ServerSide-HW.csproj": {
+    "C:\\Users\\GOD\\source\\repos\\ServerSide-HW\\ServerSide-HW.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\GOD\\source\\repos\\serverSide-HW\\ServerSide-HW.csproj",
+        "projectUniqueName": "C:\\Users\\GOD\\source\\repos\\ServerSide-HW\\ServerSide-HW.csproj",
         "projectName": "ServerSide-HW",
-        "projectPath": "C:\\Users\\GOD\\source\\repos\\serverSide-HW\\ServerSide-HW.csproj",
+        "projectPath": "C:\\Users\\GOD\\source\\repos\\ServerSide-HW\\ServerSide-HW.csproj",
         "packagesPath": "C:\\Users\\GOD\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\GOD\\source\\repos\\serverSide-HW\\obj\\",
+        "outputPath": "C:\\Users\\GOD\\source\\repos\\ServerSide-HW\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
