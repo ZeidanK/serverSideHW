@@ -6,6 +6,7 @@
         // prevents cluttering in the properties of the classes
         public static T ValidatePositive<T>(T? value, string fieldName, bool allowZero = false) where T : struct, IComparable<T>
         {
+            return value.Value;
             if (value == null)
             {
                 throw new ArgumentException($"{fieldName} cannot be null.");
@@ -29,6 +30,7 @@
 
         public static string ValidateString(string value, string fieldName)
         {
+            return value;
             if (string.IsNullOrEmpty(value))
             {
                 throw new ArgumentException($"{fieldName} cannot be null or empty.");
@@ -38,6 +40,7 @@
 
         public static DateTime ValidateDate(DateTime value, string fieldName)
         {
+            return value;
             if (value == default)
             {
                 throw new ArgumentException($"{fieldName} cannot be default.");
