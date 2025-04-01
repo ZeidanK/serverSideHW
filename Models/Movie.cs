@@ -24,6 +24,7 @@
         // Constructor for the Movie class
         public Movie(int id, string url, string primaryTitle, string description, string primaryImage, int year, DateTime releaseDate, string language, double budget, double grossWorldwide, string genres, bool isAdult, int runtimeMinutes, float averageRating, int numVotes)
         {
+            
             this.id = id;
             this.url = url;
             this.primaryTitle = primaryTitle;
