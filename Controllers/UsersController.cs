@@ -18,37 +18,37 @@ namespace ServerSide_HW.Controllers
             return users;
         }
 
-        // GET api/<UsersController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+        //// GET api/<UsersController>/5
+        //[HttpGet("{id}")]
+        //public string Get(int id)
+        //{
+        //    return "value";
+        //}
 
         // POST api/<UsersController>
         [HttpPost]
-        public void Post([FromBody] User user)
+        public bool Post([FromBody] User user)
         {
             if(user == null)
             {
-                return;// BadRequest();
+                return false;// BadRequest();
             }
             else
             {
-                user.Insert();
+               return user.Insert();
             }
         }
 
-        // PUT api/<UsersController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        //// PUT api/<UsersController>/5
+        //[HttpPut("{id}")]
+        //public void Put(int id, [FromBody] string value)
+        //{
+        //}
 
-        // DELETE api/<UsersController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        //// DELETE api/<UsersController>/5
+        //[HttpDelete("{id}")]
+        //public void Delete(int id)
+        //{
+        //}
     }
 }
