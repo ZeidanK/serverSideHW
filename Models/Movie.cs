@@ -207,6 +207,26 @@
             return movies;
         }
 
+        static public bool DeleteMovie(int id)
+        {
+            if (id < 1)
+            {
+                return false;
+            }
+            if(MoviesList.Count == 0)
+            {
+                return false;
+            }
+
+            Movie movieToDelete = MoviesList.FirstOrDefault(m => m.id == id);
+            if (movieToDelete != null)
+            {
+                MoviesList.Remove(movieToDelete);
+                return true;
+            }
+            return false;
+        }
+
         public bool CreateTestMovies()
         {
             Movie movie1 = new Movie(1, "www.movie1.com", "Movie 1", "Description 1", "image1.jpg", 2021, new DateTime(2021, 1, 1), "English", 1000000, 5000000, "Action, Adventure", false, 120, 7.5f, 1000);
