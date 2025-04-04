@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Movies Cards</title>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="Styles.css">
+    
+    
+        
+</head>
+<body>
+    <header>
+        <div class="nav-buttons">
+            <button class="nav-button active">Home</button>
+            <button class="nav-button" onclick="location.href='MyMovies.html'">My Movies</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Movies</h1>
+        <button id="loadMoviesBtn" class="btn">Load Movies</button>
+        <div id="movies-container" class="movie-grid">
+            <!-- Movie cards will be appended here -->
+        </div>
+    </div>
+
+    

@@ -3,49 +3,27 @@
 <head>
     <meta charset="utf-8" />
     <title>Movies Cards</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.6.2/css/bootstrap.min.css">
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
             crossorigin="anonymous"></script>
-    <!-- Bootstrap JS bundle (includes Popper.js) -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="Styles.css">
     
-    <style>
-        /* Custom styling for the movie cards */
-        .movie-card {
-            margin-bottom: 20px;
-        }
-        /* Adjust card width for different screen sizes */
-        @media (min-width: 768px) {
-            .col-md-4.movie-card {
-                max-width: 25%; /* 4 cards per row on medium screens */
-                flex: 0 0 25%;
-            }
-        }
-        @media (max-width: 767px) and (min-width: 576px) {
-            .col-sm-6.movie-card {
-                max-width: 33.333%; /* 3 cards per row on small screens */
-                flex: 0 0 33.333%;
-            }
-        }
-        /* Ensure the card takes full height of its container */
-        .card.h-100 {
-            border: 1px solid #ddd;
-        }
-        /* Optional: Force images to have the same height */
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
-        }
-    </style>
+    
+        
 </head>
 <body>
-    <div class="container mt-4">
-        <h1 class="mb-4">Movies</h1>
-        <button id="loadMoviesBtn" class="btn btn-primary mb-4">Load Movies</button>
-        <div id="movies-container" class="row">
+    <header>
+        <div class="nav-buttons">
+            <button class="nav-button active">Home</button>
+            <button class="nav-button" onclick="location.href='MyMovies.html'">My Movies</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Movies</h1>
+        <button id="loadMoviesBtn" class="btn">Load Movies</button>
+        <div id="movies-container" class="movie-grid">
             <!-- Movie cards will be appended here -->
         </div>
     </div>
@@ -61,37 +39,54 @@
 
             // Check if movies variable exists and is an array
             if (typeof movies !== 'undefined' && Array.isArray(movies)) {
-                // Loop through each movie and create a Bootstrap card
+                // Loop through each movie and create a card
                 $.each(movies, function(index, movie) {
-                    // Create the card container with column classes for grid layout
-                    var col = $('<div>').addClass('col-md-4 col-sm-6 movie-card');
-                    var card = $('<div>').addClass('card h-100');
-
+                    // Create the movie card
+                    var card = $('<div>').addClass('movie-card');
+                    
                     // Image if available
                     if (movie.primaryImage) {
                         var img = $('<img>')
-                            .addClass('card-img-top')
+                            .addClass('movie-img')
                             .attr('src', movie.primaryImage)
                             .attr('alt', movie.primaryTitle);
                         card.append(img);
                     }
 
-                    // Card body
-                    var cardBody = $('<div>').addClass('card-body d-flex flex-column');
-                    cardBody.append($('<h5>').addClass('card-title').text(movie.primaryTitle));
-                    cardBody.append($('<p>').addClass('card-text').html('<strong>Year:</strong> ' + movie.year));
-
+                    // Card content
+                    var content = $('<div>').addClass('movie-content');
+                    content.append($('<div>').addClass('movie-title').text(movie.primaryTitle));
+                    content.append($('<div>').addClass('movie-info').html('<strong>Year:</strong> ' + (movie.startYear || 'N/A')));
+                    
                     // Movie description truncated if needed
                     var desc = movie.description ? movie.description.substring(0, 150) + '...' : 'No description available.';
-                    cardBody.append($('<p>').addClass('card-text').html('<strong>Description:</strong> ' + desc));
+                    content.append($('<div>').addClass('movie-info').html('<strong>Description:</strong> ' + desc));
+
+                    // Movie rating
+                    content.append($('<div>').addClass('movie-rating').html('<strong>Rating:</strong> ' + movie.averageRating));
+
+                    // Display genres (if exists as an array, join with commas; if string, display as is)
+                    var genresHtml = '';
+                    if (Array.isArray(movie.genres)) {
+                        genresHtml = movie.genres.join(', ');
+                    } else {
+                        genresHtml = movie.genres;
+                    }
+                    content.append($('<div>').addClass('movie-info').html('<strong>Genres:</strong> ' + genresHtml));
                     
-                    cardBody.append($('<p>').addClass('card-text mt-auto').html('<strong>Rating:</strong> ' + movie.averageRating));
-                    card.append(cardBody);
-                    col.append(card);
-                    container.append(col);
+                    // Footer with budget, box office and votes
+                    var footer = $('<div>').addClass('movie-footer mt-2').html(
+                        '<strong>Budget:</strong> $' + Number(movie.budget).toLocaleString() +
+                        ' | <strong>Box Office:</strong> $' + Number(movie.grossWorldwide).toLocaleString() +
+                        ' | <strong>Votes:</strong> ' + Number(movie.numVotes).toLocaleString()
+                    );
+                    content.append(footer);
+                    
+                    card.append(content);
+                    container.append(card);
                 });
             } else {
-                container.html('<div class="col-12 alert alert-warning">No movie data available.</div>');
+                container.html('<div style="grid-column: 1/-1; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">No movie data available.</div>');
             }
         });
     </script>
