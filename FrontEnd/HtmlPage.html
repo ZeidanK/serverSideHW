@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies JSON Viewer</title>
+    <style>
+        body {
+            font-family: monospace;
+            white-space: pre;
+            margin: 20px;
+        }
+    </style>
+    <!-- Include the local movies.js file -->
+    <script src="movies.js"></script>
+</head>
+<body>
+    <h1>Movies JSON Data</h1>
+    <div id="jsonData">Loading JSON data...</div>
+
+    <script>
+        // Assuming movies.js defines a variable (like "movies") containing the data
+        // If the variable name is different, adjust accordingly
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Display the JSON data (replace "movies" with actual variable name if different)
+                document.getElementById('jsonData').textContent = JSON.stringify(movies, null, 2);
+            } catch (error) {
+                console.error('Error loading JSON data:', error);
+                document.getElementById('jsonData').textContent = 'Error loading JSON data: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
