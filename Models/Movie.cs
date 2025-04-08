@@ -51,60 +51,61 @@
         // extra validation is done in the ValidationHelper class
         // should use camleCase for the properties
 
-        public int Id
+        
+public int Id
         {
             get => id;
-            set => id = ValidationHelper.ValidatePositive<int>(value, nameof(Id), allowZero: false);
+            set => id = value;
         }
         public string Url
         {
             get => url;
-            set => url = ValidationHelper.ValidateString(value, nameof(Url));
+            set => url = value;
         }
         public string PrimaryTitle
         {
             get => primaryTitle;
-            set => primaryTitle = ValidationHelper.ValidateString(value, nameof(PrimaryTitle));
+            set => primaryTitle = value;
         }
         public string Description
         {
             get => description;
-            set => description = ValidationHelper.ValidateString(value, nameof(Description));
+            set => description = value;
         }
         public string PrimaryImage
         {
             get => primaryImage;
-            set => primaryImage = ValidationHelper.ValidateString(value, nameof(PrimaryImage));
+            set => primaryImage = value;
         }
         public int Year
         {
             get => year;
-            set => year = ValidationHelper.ValidatePositive<int>(value, nameof(Year), allowZero: true);
+            set => year = value;
         }
         public DateTime ReleaseDate
         {
             get => releaseDate;
-            set => releaseDate = ValidationHelper.ValidateDate(value, nameof(ReleaseDate));
+            set => releaseDate = value;
         }
         public string Language
         {
             get => language;
-            set => language = ValidationHelper.ValidateString(value, nameof(Language));
+            set => language = value;
         }
         public double Budget
         {
             get => budget;
-            set => budget = ValidationHelper.ValidatePositive<double>(value, nameof(Budget), allowZero: true);
+            set => budget = value;
         }
         public double GrossWorldwide
         {
             get => grossWorldwide;
-            set => grossWorldwide = ValidationHelper.ValidatePositive<double>(value, nameof(GrossWorldwide), allowZero: true);
+            set => grossWorldwide = value;
         }
         public string Genres
         {
             get => genres;
-            set => genres = ValidationHelper.ValidateString(value, nameof(Genres));
+            set => genres = value;
         }
         public bool IsAdult
         {
@@ -114,18 +115,52 @@
         public int RuntimeMinutes
         {
             get => runtimeMinutes;
-            set => runtimeMinutes = ValidationHelper.ValidatePositive<int>(value, nameof(RuntimeMinutes), allowZero: true);
+            set => runtimeMinutes = value;
         }
         public float AverageRating
         {
             get => averageRating;
-            set => averageRating = ValidationHelper.ValidatePositive<float>(value, nameof(AverageRating), allowZero: true);
+            set => averageRating = value;
         }
         public int NumVotes
         {
             get => numVotes;
-            set => numVotes = ValidationHelper.ValidatePositive<int>(value, nameof(NumVotes), allowZero: true);
+            set => numVotes = value;
         }
+
+        public bool ValidateMovie()
+        {
+            if (!checkValidId(this.id) || !checkValidTitle(this.primaryTitle))
+            {
+                throw new Exception($"Validation failed: id or primary title error");
+                return false;
+            }
+            try
+            {
+                ValidationHelper.ValidatePositive<int>(this.id, nameof(Id), allowZero: false);
+                ValidationHelper.ValidateString(this.url, nameof(Url));
+                ValidationHelper.ValidateString(this.primaryTitle, nameof(PrimaryTitle));
+                ValidationHelper.ValidateString(this.description, nameof(Description));
+                ValidationHelper.ValidateString(this.primaryImage, nameof(PrimaryImage));
+                ValidationHelper.ValidatePositive<int>(this.year, nameof(Year), allowZero: true);
+                ValidationHelper.ValidateDate(this.releaseDate, nameof(ReleaseDate));
+                ValidationHelper.ValidateString(this.language, nameof(Language));
+                ValidationHelper.ValidatePositive<double>(this.budget, nameof(Budget), allowZero: true);
+                ValidationHelper.ValidatePositive<double>(this.grossWorldwide, nameof(GrossWorldwide), allowZero: true);
+                ValidationHelper.ValidateString(this.genres, nameof(Genres));
+                ValidationHelper.ValidatePositive<int>(this.runtimeMinutes, nameof(RuntimeMinutes), allowZero: true);
+                ValidationHelper.ValidatePositive<float>(this.averageRating, nameof(AverageRating), allowZero: true);
+                ValidationHelper.ValidatePositive<int>(this.numVotes, nameof(NumVotes), allowZero: true);
+                //return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Validation failed: {ex.Message}");
+                //return false;
+            }
+            return true;
+        }
+      
 
         public bool checkValidId(int id)
         {
@@ -159,14 +194,12 @@
             return true;
         }
 
-        public bool insert()
+        public bool Insert()
         {
-            if (!checkValidId(this.id) || !checkValidTitle(this.primaryTitle))
-            {
-                return false;
-            }
+            
             try
             {
+                this.ValidateMovie();
                 MoviesList.Add(this);
             }
             catch (Exception e)
