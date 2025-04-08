@@ -31,7 +31,95 @@
     <!-- Include movies.js which sets up the movies variable -->
     <script src="movies.js"></script>
 
-    <script>
+   <!-- filepath: /c:/Users/GOD/Desktop/repoServerSide/FrontEnd/index.html -->
+<script>
+        // The AJAX call function as specified
+        function ajaxCall(method, api, data, successCB, errorCB) {
+            $.ajax({
+                type: method, // Get/Post/Put/Delete/Patch
+                url: api, // routing to the server
+                data: data, // the data we pass in the body (if any…)
+                cache: false, // allow caching
+                contentType: "application/json", // the data format we expect back
+                dataType: "json", // the data format that we send 
+                //crossDomain: true, 
+                success: successCB, // the success callback function
+                error: errorCB // the error callback function
+            });
+        }
+        
+        // Success callback function
+        function onSuccess(data, buttonElement) {
+            var messageBox = $('<div>')
+            .addClass('message-box')
+            .css({
+            'padding': '10px',
+            'margin': '10px 0',
+            'border-radius': '4px',
+            'font-size': '14px',
+            'color': '#155724',
+            'background-color': '#d4edda',
+            'border': '1px solid #c3e6cb'
+            });
+
+            if (data === false) {
+            messageBox
+                .text("The movie was not added.")
+                .css({
+                'color': '#856404',
+                'background-color': '#fff3cd',
+                'border': '1px solid #ffeeba'
+                });
+            } else {
+            messageBox.text("Success! Movie added.");
+            }
+
+            // Insert the message box after the button
+            $(buttonElement).after(messageBox);
+            setTimeout(() => messageBox.fadeOut(500, () => messageBox.remove()), 3000);
+        }
+        // Error callback function
+        function onError(xhr, status, error) {
+            var messageBox = $('<div>')
+            .addClass('message-box')
+            .css({
+                'padding': '10px',
+                'margin': '10px 0',
+                'border-radius': '4px',
+                'font-size': '14px',
+                'color': '#721c24',
+                'background-color': '#f8d7da',
+                'border': '1px solid #f5c6cb'
+            })
+            .text("Error adding movie: " + status);
+
+            $('body').prepend(messageBox);
+            setTimeout(() => messageBox.fadeOut(500, () => messageBox.remove()), 3000);
+            console.error(xhr.responseText);
+        }
+        // Function to add a movie using AJAX
+        function addMovieToCollection(movieData,buttonElement) {
+            // Ensure ID is an integer
+            //movieData.id = parseInt(movieData.id);
+            
+            // Ensure genres is a string (if it's an array, join it)
+            if (Array.isArray(movieData.genres)) {
+                movieData.genres = movieData.genres.join(', ');
+            }
+            
+            // Call the AJAX function
+            ajaxCall(
+                "POST", 
+                "https://localhost:7026/api/movies", 
+                JSON.stringify(movieData), 
+                function(data) {
+            // Call onSuccess with both the data and button element
+            onSuccess(data, buttonElement);
+        },
+                onError
+            );
+        }
+
         // Button click event to load movies
         $('#loadMoviesBtn').on('click', function () {
             var container = $('#movies-container');
@@ -56,7 +144,7 @@
                     // Card content
                     var content = $('<div>').addClass('movie-content');
                     content.append($('<div>').addClass('movie-title').text(movie.primaryTitle));
-                    content.append($('<div>').addClass('movie-info').html('<strong>Year:</strong> ' + (movie.startYear || 'N/A')));
+                    content.append($('<div>').addClass('movie-info').html('<strong>Year:</strong> ' + (movie.startYear || movie.year || 'N/A')));
                     
                     // Movie description truncated if needed
                     var desc = movie.description ? movie.description.substring(0, 150) + '...' : 'No description available.';
@@ -81,6 +169,46 @@
                         ' | <strong>Votes:</strong> ' + Number(movie.numVotes).toLocaleString()
                     );
                     content.append(footer);
+                    
+                    // Add "Add Movie" button
+                    var addBtn = $('<button>')
+                        .addClass('add-movie-btn')
+                        .text('Add Movie')
+                        .css({
+                            'background-color': '#007bff',
+                            'color': 'white',
+                            'border': 'none',
+                            'padding': '8px 15px',
+                            'margin-top': '10px',
+                            'cursor': 'pointer',
+                            'border-radius': '4px'
+                        })
+                        .click(function() {
+                            var clickedButton = $(this);
+                            // Create a copy of the movie object for posting
+                            var movieToAdd = {
+                                id: index+1,
+                                url: movie.url || "string",
+                                primaryTitle: movie.primaryTitle,
+                                description: movie.description || "string",
+                                primaryImage: movie.primaryImage || "string",
+                                year: movie.year || movie.startYear || 0,
+                                releaseDate: movie.releaseDate || "2025-04-07T18:32:37.080Z",
+                                language: movie.language || "string",
+                                budget: movie.budget || 0,
+                                grossWorldwide: movie.grossWorldwide || 0,
+                                genres: movie.genres || "string",
+                                isAdult: movie.isAdult || false,
+                                runtimeMinutes: movie.runtimeMinutes || 0,
+                                averageRating: movie.averageRating || 0,
+                                numVotes: movie.numVotes || 0
+                            };
+                            
+                            // Call function to add movie
+                            addMovieToCollection(movieToAdd,clickedButton);
+                        });
+                    
+                    content.append(addBtn);
                     
                     card.append(content);
                     container.append(card);
