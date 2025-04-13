@@ -29,16 +29,16 @@ namespace ServerSide_HW.Controllers
             Movie movie5 = new Movie(5, "www.movie5.com", "Movie 5", "Description 5", "image5.jpg", 2017, new DateTime(2017, 5, 5), "German", 5000000, 9000000, "Sci-Fi, Fantasy", false, 160, 8.5f, 5000);
 
             movies.Add(movie1);
-            movie1.insert();
+            //movie1.insert();
 
-            movies.Add(movie2);
-            movies.Add(movie3);
-            movies.Add(movie4);
-            movies.Add(movie5);
-            movie2.insert();
-            movie3.insert();
-            movie4.insert();
-            movie5.insert();
+            //movies.Add(movie2);
+            //movies.Add(movie3);
+            //movies.Add(movie4);
+            //movies.Add(movie5);
+            //movie2.insert();
+            //movie3.insert();
+            //movie4.insert();
+            //movie5.insert();
             movies = Movie.Read();
             return movies;
         }
@@ -61,11 +61,28 @@ namespace ServerSide_HW.Controllers
         }
         // POST api/<MoviesController>
         [HttpPost]
+        //public bool Post([FromBody] Movie movie)
+        //{
+        //    try { return movie.insert(); }
+        //    catch (Exception e) { Console.WriteLine(e.Message); return false; }
+        //    return true;
+        //}
         public bool Post([FromBody] Movie movie)
         {
-            try { return movie.insert(); }
-            catch (Exception e) { Console.WriteLine(e.Message); return false; }
-            return true;
+            //if (!ModelState.IsValid) // Checks validation attributes
+            //{
+            //    return BadRequest(ModelState); // Returns 400 with error details
+            //}
+            try
+            {
+                movie.ValidateMovie();
+                return movie.Insert();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
         }
 
         //// PUT api/<MoviesController>/5
