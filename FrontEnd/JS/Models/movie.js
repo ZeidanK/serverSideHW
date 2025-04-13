@@ -288,7 +288,7 @@ createAddButton: function(movieInstance, index) {
                         null, 
                         function() {
                             alert("Success! Movie deleted.");
-                            MovieUtils.loadServerMovies();
+                            MovieUtils.initMyMoviesPage();
                         }, 
                         MovieUtils.showErrorMessage
                     );
@@ -462,14 +462,99 @@ createAddButton: function(movieInstance, index) {
 
     initMyMoviesPage: function() {
         const container = $('#movies-container');
-        const myMovies = JSON.parse(localStorage.getItem('myMovies')) || [];
+        container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Loading your movies...</div>');
 
-        if (myMovies.length > 0) {
-            MovieUtils.displayMovies(myMovies, container, true);
-        } else {
-            container.html('<div style="grid-column: 1/-1; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">You have no saved movies.</div>');
-        }
+        // Get movies from server
+        MovieUtils.ajaxCall(
+            "GET",
+            "/api/movies",
+            null,
+            function(data) {
+                if (data && data.length > 0) {
+                    MovieUtils.displayMovies(data, container, true);
+                } else {
+                    container.html('<div style="grid-column: 1/-1; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">You have no saved movies.</div>');
+                }
+            },
+            MovieUtils.showErrorMessage
+        );
     }
+    // initMyMoviesPage: function() {
+    //     const container = $('#movies-container');
+    //     const myMovies = JSON.parse(localStorage.getItem('myMovies')) || [];
+
+    //     if (myMovies.length > 0) {
+    //         MovieUtils.displayMovies(myMovies, container, true);
+    //     } else {
+    //         container.html('<div style="grid-column: 1/-1; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">You have no saved movies.</div>');
+    //     }
+    // }
 };
+
+//Success callback for GET request
+function onGetSuccess(data) {
+    var container = $('#movies-container');
+    MovieUtils.displayMovies(data, container, true);
+}
+
+// Success callback for DELETE request
+function onDeleteSuccess(data) {
+    alert("Success! Movie deleted.");
+    // Reload the movies to refresh the list
+    loadMovies();
+}
+
+// Error callback function
+function onError(xhr, status, error) {
+    alert("Error: " + status);
+    console.error(xhr.responseText);
+}
+
+// Function to delete a movie using AJAX
+function deleteMovie(id) {
+    if (confirm("Are you sure you want to delete this movie?")) {
+        // Call the AJAX function with DELETE method
+        ajaxCall(
+            "DELETE", 
+            "https://localhost:7026/api/movies/" + id, 
+            null, 
+            onDeleteSuccess, 
+            onError
+        );
+    }
+}
+
+
+
+// Function to search movies by title
+function searchMoviesByTitle(title) {
+    var container = $('#movies-container');
+    container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Searching for movies with title "' + title + '"...</div>');
+    
+    // Get movies by title
+    ajaxCall(
+    "GET",
+    "https://localhost:7026/api/movies/(title)?title=" + title,
+    null,
+    onGetSuccess,
+    onError
+    );
+}
+
+// Function to search movies by date range
+function searchMoviesByDateRange(startDate, endDate) {
+    var container = $('#movies-container');
+    container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Searching for movies released between ' + startDate + ' and ' + endDate + '...</div>');
+    
+    // Get movies by date range
+    ajaxCall(
+        "GET",
+        "https://localhost:7026/api/movies/GetByReleaseDate/startDate/" + startDate + "/endDate/" + endDate,
+        null,
+        onGetSuccess,
+        onError
+    );
+}
+
 
 
