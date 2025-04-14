@@ -90,3 +90,20 @@ h1 {
     background-color: #007095;
 }
 
+.auth-links {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.auth-link {
+    color: #008CBA;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+    color: #005f8a;
+}
