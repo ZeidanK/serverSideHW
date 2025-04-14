@@ -17,6 +17,32 @@ class Movie {
         this.numVotes = numVotes;
     }
 }
+const MOVIE_GENRES = [
+    "Action",
+    "Adventure", 
+    "Animation",
+    "Biography",
+    "Comedy",
+    "Crime",
+    "Documentary",
+    "Drama",
+    "Family",
+    "Fantasy",
+    "History",
+    "Horror",
+    "Music",
+    "Musical",
+    "Mystery",
+    "Romance",
+    "Sci-Fi",
+    "Sport",
+    "Thriller",
+    "War",
+    "Western"
+];
+
+// Make it globally accessible
+window.MOVIE_GENRES = MOVIE_GENRES;
 
 // Define a MovieCard class
 class MovieCard {
@@ -139,61 +165,7 @@ const port = "7026";
             return content;
         },
         
-        // Create an Add Movie button
-        // createAddButton: function(movieInstance, index) {
-        //     const addBtn = $('<button>')
-        //         .addClass('add-movie-btn')
-        //         .text('Add Movie')
-        //         .css({
-        //             'background-color': '#007bff',
-        //             'color': 'white',
-        //             'border': 'none',
-        //             'padding': '8px 15px',
-        //             'margin-top': '10px',
-        //             'cursor': 'pointer',
-        //             'border-radius': '4px'
-        //         });
-                
-        //     // Set up click handler
-        //     addBtn.on('click', function() {
-        //         const clickedButton = $(this);
-                
-        //         // Create movie data object for POST
-        //         const movieToAdd = {
-        //             id: movieInstance.id || index+1,
-        //             url: "string",
-        //             primaryTitle: movieInstance.title,
-        //             description: movieInstance.description || "string",
-        //             primaryImage: movieInstance.image || "string",
-        //             year: movieInstance.year || 0,
-        //             releaseDate: movieInstance.releaseDate || "2025-04-07T18:32:37.080Z",
-        //             language: movieInstance.language || "string",
-        //             budget: movieInstance.budget || 0,
-        //             grossWorldwide: movieInstance.grossWorldwide || 0,
-        //             genres: typeof movieInstance.genres === 'object' ? 
-        //                     MovieUtils.formatGenres(movieInstance.genres) : 
-        //                     (movieInstance.genres || "string"),
-        //             isAdult: movieInstance.isAdult || false,
-        //             runtimeMinutes: movieInstance.runtimeMinutes || 0,
-        //             averageRating: movieInstance.averageRating || 0,
-        //             numVotes: movieInstance.numVotes || 0
-        //         };
-                
-        //         // Submit via AJAX
-        //         MovieUtils.ajaxCall(
-        //             "POST", 
-        //             "/api/movies", 
-        //             JSON.stringify(movieToAdd), 
-        //             function(data) {
-        //                 // Show success message
-        //                 MovieUtils.showSuccessMessage(data, clickedButton);
-        //             },
-        //             MovieUtils.showErrorMessage
-        //         );
-        //     });
-            
-        //     return addBtn;
-        // },
+   
         // Create an Add Movie button
 createAddButton: function(movieInstance, index) {
     // Button styling stays the same
