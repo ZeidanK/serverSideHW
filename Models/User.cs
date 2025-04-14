@@ -31,25 +31,27 @@
         {
         }
 
+       
+        
         public int Id
         {
             get => id;
-            set => id = ValidationHelper.ValidatePositive<int>(value, nameof(Id));
+            set => id = value;
         }
         public string Name
         {
             get => name;
-            set => name = ValidationHelper.ValidateString(value, nameof(Name));
+            set => name = value;
         }
         public string Email
         {
             get => email;
-            set => email = ValidationHelper.ValidateString(value, nameof(Email));
+            set => email = value;
         }
         public string Password
         {
             get => password;
-            set => password = ValidationHelper.ValidateString(value, nameof(Password));
+            set => password = value;
         }
         public bool Active
         {
@@ -57,6 +59,43 @@
             set => active = value;
         }
 
+        public static bool ValidateUser(User user)
+        {
+            if (user == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                user.Id = ValidationHelper.ValidatePositive<int>(user.Id, nameof(user.Id));
+                user.Name = ValidationHelper.ValidateString(user.Name, nameof(user.Name));
+                user.Email = ValidationHelper.ValidateString(user.Email, nameof(user.Email));
+                user.Password = ValidationHelper.ValidateString(user.Password, nameof(user.Password));
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        
+        public bool Register(User user)
+        {
+            try
+            {
+                ValidateUser(user);
+            }
+            catch
+            {
+                throw new Exception("Validation failed");
+            }
+            if (UsersList.Any(u => u.Id == user.Id)||UsersList.Any(u=>u.Email==user.Email))
+            {
+                throw new Exception("User already exists");
+            }
+            return true;
+        }
 
         public bool Insert()
         {

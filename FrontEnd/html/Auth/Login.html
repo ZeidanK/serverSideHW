@@ -7,19 +7,30 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
             crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../../CSS/Styles.css">
-    <link rel="stylesheet" href="../CSS/moviesCard.css">
-<script src="../../JS/layout/Header.js"></script>
+    <link rel="stylesheet" href="../../CSS/Styles.css">  
+    <link rel="stylesheet" href="../../CSS/Auth.css">   
+    <script src="../../JS/layout/Header.js"></script>
 </head>
 <body>
     <header>
         
     </header>
-
-    
-
-    
-    
-    
-</body>
+    <div class="auth-container">
+        <h1 class="auth-title">Log In</h1>
+        <form id="loginForm" class="auth-form">
+            <div class="auth-form-group">
+                <label for="username" class="auth-label">Username:</label>
+                <input type="text" id="username" name="username" class="auth-input" required>
+            </div>
+            <div class="auth-form-group">
+                <label for="password" class="auth-label">Password:</label>
+                <input type="password" id="password" name="password" class="auth-input" required>
+            </div>
+            <button type="submit" class="auth-btn">Log In</button>
+        </form>
+        <div class="auth-links">
+            <a href="ForgotPassword.html" class="auth-link">Forgot Password?</a>
+            <a href="Register.html" class="auth-link">Register</a>
+        </div>
+    </div>
 </html>
