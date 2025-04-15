@@ -3,6 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <title>Movies Cards</title>
+
+<!-- AUTHENTICATION GATE - Must be first! -->
+<script>
+    
+</script>
+
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
@@ -10,8 +17,13 @@
     <link rel="stylesheet" href="../../CSS/Styles.css">
     <link rel="stylesheet" href="../../CSS/moviesCard.css">
 
+    
+
     <script src="../../JS/layout/Header.js"></script>
     <script src="../../JS/Models/movie.js"></script>
+    <script src="../../JS/Models/User.js"></script>
+    <!-- Auth protection - automatically checks login -->
+    <!-- <script src="../../JS/Auth/authProtection.js"></script> -->
     <style>
         .filter-section {
             background-color: #f5f5f5;
@@ -96,7 +108,8 @@
             <!-- Movie cards will be appended here -->
         </div>
     </div>
-
+</body>
+</html>
     <script>
         // The AJAX call function as specified
         function ajaxCall(method, api, data, successCB, errorCB) {
@@ -151,6 +164,29 @@ $('#loadMoviesBtn').on('click', function() {
     MovieUtils.initMyMoviesPage();
 });
 
+// Listen for successful authentication
+document.addEventListener('auth:success', function(e) {
+    console.log("Auth success event received, user:", e.detail.user);
+    
+    // Initialize page content only after authentication is confirmed
+    MovieUtils.initMyMoviesPage();
+});
+
+$(document).ready(function() {
+    // Call the function to load movies when document is ready
+    //checkAccess();
+    MovieUtils.initMyMoviesPage();
+});
+
+
+async function checkAccess1() {
+    const isLoggedIn = await UserManager.isLoggedIn();
+    if (isLoggedIn) {
+        console.log("User is logged in:", UserManager.currentUser.name);
+        // Show restricted content
+    } else {
+        // Redirect to login page
+        window.location.href = "login.html";
+    }
+}
     </script>
-</body>
-</html>
