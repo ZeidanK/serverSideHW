@@ -59,6 +59,7 @@ class MovieCard {
 
 // Define a constant for the port
 const port = "7026";
+const address ="https://localhost:";
 
 
 
@@ -67,7 +68,7 @@ const port = "7026";
         ajaxCall: function(method, api, data, successCB, errorCB) {
             $.ajax({
                 type: method,
-                url: `https://localhost:${port}${api}`,
+                url: `${address}${port}${api}`,
                 data: data,
                 cache: false,
                 contentType: "application/json",
@@ -345,7 +346,7 @@ createAddButton: function(movieInstance, index) {
             return card;
         },
     
-        // Rest of your methods...
+        
     
     displayMovies: function(movies, container, isMyMovies = false) {
         container.empty();
@@ -393,35 +394,7 @@ createAddButton: function(movieInstance, index) {
                 }
             },
 
-            searchMoviesByTitle: function(title) {
-        const container = $('#movies-container');
-        container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Searching for movies with title "' + title + '"...</div>');
 
-        MovieUtils.ajaxCall(
-            "GET",
-            `/api/movies/(title)?title=${encodeURIComponent(title)}`,
-            null,
-            function(data) {
-                MovieUtils.displayMovies(data, container, true);
-            },
-            MovieUtils.showErrorMessage
-        );
-    },
-
-    searchMoviesByDateRange: function(startDate, endDate) {
-        const container = $('#movies-container');
-        container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Searching for movies released between ' + startDate + ' and ' + endDate + '...</div>');
-
-        MovieUtils.ajaxCall(
-            "GET",
-            `/api/movies/GetByReleaseDate/startDate/${startDate}/endDate/${endDate}`,
-            null,
-            function(data) {
-                MovieUtils.displayMovies(data, container, true);
-            },
-            MovieUtils.showErrorMessage
-        );
-    },
 
     showErrorMessage: function(xhr) {
         const container = $('#movies-container');
@@ -451,16 +424,7 @@ createAddButton: function(movieInstance, index) {
             MovieUtils.showErrorMessage
         );
     }
-    // initMyMoviesPage: function() {
-    //     const container = $('#movies-container');
-    //     const myMovies = JSON.parse(localStorage.getItem('myMovies')) || [];
-
-    //     if (myMovies.length > 0) {
-    //         MovieUtils.displayMovies(myMovies, container, true);
-    //     } else {
-    //         container.html('<div style="grid-column: 1/-1; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">You have no saved movies.</div>');
-    //     }
-    // }
+   
 };
 
 //Success callback for GET request
@@ -504,13 +468,14 @@ function searchMoviesByTitle(title) {
     container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Searching for movies with title "' + title + '"...</div>');
     
     // Get movies by title
-    ajaxCall(
-    "GET",
-    "https://localhost:7026/api/movies/(title)?title=" + title,
-    null,
-    onGetSuccess,
-    onError
-    );
+    MovieUtils.ajaxCall("GET","/api/movies/(title)?title=" + title,null,onGetSuccess,onError);
+    // ajaxCall(
+    // "GET",
+    // "https://localhost:7026/api/movies/(title)?title=" + title,
+    // null,
+    // onGetSuccess,
+    // onError
+    // );
 }
 
 // Function to search movies by date range
