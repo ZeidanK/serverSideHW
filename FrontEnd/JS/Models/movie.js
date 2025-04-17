@@ -469,13 +469,7 @@ function searchMoviesByTitle(title) {
     
     // Get movies by title
     MovieUtils.ajaxCall("GET","/api/movies/(title)?title=" + title,null,onGetSuccess,onError);
-    // ajaxCall(
-    // "GET",
-    // "https://localhost:7026/api/movies/(title)?title=" + title,
-    // null,
-    // onGetSuccess,
-    // onError
-    // );
+   
 }
 
 // Function to search movies by date range
