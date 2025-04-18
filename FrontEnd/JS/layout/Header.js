@@ -88,11 +88,31 @@ const HeaderComponent = {
         AddMovie.onclick = function() { location.href = paths.AddMoviePath; };
         navButtonsContainer.appendChild(AddMovie);
 
-        const loginButton = document.createElement('button');
-        loginButton.className = `nav-button-right ${currentPage === 'Login.html' ? 'active' : ''}`;
-        loginButton.textContent = 'Login';
-        loginButton.onclick = function() { location.href = paths.loginPath; };
-        navButtonsRightContainer.appendChild(loginButton);
+        const userEmail = localStorage.getItem('user.email');
+        
+        if (userEmail) {
+            // Create a logout button and display user email
+            const userInfo = document.createElement('span');
+            userInfo.className = 'user-info';
+            userInfo.textContent = `Logged in as: ${userEmail}`;
+            navButtonsRightContainer.appendChild(userInfo);
+
+            const logoutButton = document.createElement('button');
+            logoutButton.className = 'nav-button-right';
+            logoutButton.textContent = 'Log Out';
+            logoutButton.onclick = function() {
+            localStorage.removeItem('user.email');
+            location.reload(); // Reload the page to update the header
+            };
+            navButtonsRightContainer.appendChild(logoutButton);
+        } else {
+            // Create a login button
+            const loginButton = document.createElement('button');
+            loginButton.className = `nav-button-right ${currentPage === 'Login.html' ? 'active' : ''}`;
+            loginButton.textContent = 'Login';
+            loginButton.onclick = function() { location.href = paths.loginPath; };
+            navButtonsRightContainer.appendChild(loginButton);
+        }
 
         // Append the nav buttons container to the header
         const container = document.getElementById(containerId) || document.querySelector('header');
