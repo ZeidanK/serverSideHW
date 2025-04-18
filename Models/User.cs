@@ -1,4 +1,7 @@
-﻿namespace ServerSide_HW.Models
+﻿using System.Security.Cryptography;
+using System.Text;
+
+namespace ServerSide_HW.Models
 {
     public class User
     {
@@ -110,6 +113,14 @@
         {
             return UsersList;
         }
-
+        static public string HashPassword(string password)
+        {
+            using (var sha512 = SHA512.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(password);
+                var hash = sha512.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
+            }
+        }
     }
 }

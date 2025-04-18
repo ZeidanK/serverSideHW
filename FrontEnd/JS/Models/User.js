@@ -96,10 +96,10 @@ const UserManager = {
 };
 
 // Initialize when document is ready
-$(document).ready(function() {
-    // Initialize user session
-    UserManager.initialize();
+// $(document).ready(function() {
+//     // Initialize user session
+//     UserManager.initialize();
     
-    // Update UI based on session status
-    UserManager.updateUI();
-});
+//     // Update UI based on session status
+//     UserManager.updateUI();
+// });
