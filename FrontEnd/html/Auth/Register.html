@@ -106,7 +106,29 @@
                     // Convert the user object to JSON string for the API call
                     const userData = JSON.stringify(user);
                     
-                    UserManager.logIn(user);
+                    UserManager.ajaxCall(
+                        'POST', 
+                        '/api/Users/Register', 
+                        userData,
+                        function(response) {
+                            // Success callback
+                            showMessage('Registration successful! Redirecting to login...', 'success');
+                            
+                            // Store user email in localStorage as per your UserManager implementation
+                            localStorage.setItem('user.email', user.email);
+                            
+                            // Redirect to login page after a short delay
+                            setTimeout(function() {
+                                window.location.href = 'Login.html';
+                            }, 2000);
+                        },
+                        function(error) {
+                            // Error callback
+                            console.error('Registration failed:', error);
+                            showMessage(error.responseJSON?.message || 'Registration failed. Please try again.', 'error');
+                            submitBtn.prop('disabled', false).text(originalBtnText);
+                        }
+                    );
                 } catch (err) {
                     console.error('Error during registration:', err);
                     showMessage('An unexpected error occurred', 'error');
