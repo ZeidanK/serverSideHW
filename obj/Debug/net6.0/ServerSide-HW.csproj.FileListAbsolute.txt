@@ -72,3 +72,10 @@ C:\Users\GOD\Desktop\repoServerSide\obj\Debug\net6.0\refint\ServerSide-HW.dll
 C:\Users\GOD\Desktop\repoServerSide\obj\Debug\net6.0\ServerSide-HW.pdb
 C:\Users\GOD\Desktop\repoServerSide\obj\Debug\net6.0\ServerSide-HW.genruntimeconfig.cache
 C:\Users\GOD\Desktop\repoServerSide\obj\Debug\net6.0\ref\ServerSide-HW.dll
+C:\Users\GOD\Desktop\repoServerSide\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\GOD\Desktop\repoServerSide\bin\Debug\net6.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\GOD\Desktop\repoServerSide\bin\Debug\net6.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\GOD\Desktop\repoServerSide\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\GOD\Desktop\repoServerSide\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\GOD\Desktop\repoServerSide\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\GOD\Desktop\repoServerSide\bin\Debug\net6.0\System.IdentityModel.Tokens.Jwt.dll
