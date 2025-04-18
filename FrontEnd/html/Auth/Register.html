@@ -23,7 +23,7 @@
             
             <div class="auth-form-group">
                 <label for="name" class="auth-label">Full Name:</label>
-                <input type="text" id="name" name="name" class="auth-input" required>
+                <input type="text" id="name" name="name" class="auth-input" pattern="[A-Za-z]{2,}" title="Name must contain only letters and be at least 2 characters long" required>
             </div>
             
             <div class="auth-form-group">
@@ -33,12 +33,11 @@
             
             <div class="auth-form-group">
                 <label for="password" class="auth-label">Password:</label>
-                <input type="password" id="password" name="password" class="auth-input" required>
+                <input type="password" id="password" name="password" class="auth-input" pattern="(?=.*[0-9])(?=.*[A-Z]).{8,}" title="Password must be at least 8 characters long, contain at least one number and one uppercase letter" required>
                 <div class="password-requirements">
-                    Password must be at least 8 characters
+                    Password must be at least 8 characters, contain at least one number and one uppercase letter.
                 </div>
             </div>
-            
             <div class="auth-form-group">
                 <label for="confirmPassword" class="auth-label">Confirm Password:</label>
                 <input type="password" id="confirmPassword" name="confirmPassword" class="auth-input" required>
