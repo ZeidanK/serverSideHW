@@ -9,7 +9,52 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../../CSS/Styles.css">  
     <link rel="stylesheet" href="../../CSS/Auth.css">   
+    <script src="../../JS/Models/User.js"></script>
+
     <script src="../../JS/layout/Header.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Check if user is already logged in
+            const userToken = localStorage.getItem('user.email');
+            if (userToken) {
+                // Redirect to homepage if logged in
+                window.location.href = '../index.html';
+                return;
+            }
+    
+            // Handle login form submission
+            $('#loginForm').on('submit', function(event) {
+                event.preventDefault();
+    
+                const user = {
+                    id: 1,
+                    name: "exampleName", // Replace with a valid name if needed
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    active: true
+                };
+    
+                // API call to log in the user
+                UserManager.ajaxCall(
+                    'POST',
+                   '/api/Users/Login',
+                    
+                    JSON.stringify(user),
+                    function(response) {
+                        // Store token in localStorage
+                        localStorage.setItem('user.email', user.email);
+    
+                        // Redirect to homepage
+                        window.location.href = '../index.html';
+                    },
+                    function(error) {
+                        console.error('Login failed:', error);
+                        alert(error.responseJSON?.message || 'Login failed. Please try again.');
+                    }
+                );
+            });
+        });
+    </script>
 </head>
 <body>
     <header>
@@ -19,8 +64,8 @@
         <h1 class="auth-title">Log In</h1>
         <form id="loginForm" class="auth-form">
             <div class="auth-form-group">
-                <label for="username" class="auth-label">Username:</label>
-                <input type="text" id="username" name="username" class="auth-input" required>
+                <label for="email" class="auth-label">Username:</label>
+                <input type="text" id="email" name="email" class="auth-input" required>
             </div>
             <div class="auth-form-group">
                 <label for="password" class="auth-label">Password:</label>
