@@ -88,23 +88,33 @@ const HeaderComponent = {
         AddMovie.onclick = function() { location.href = paths.AddMoviePath; };
         navButtonsContainer.appendChild(AddMovie);
 
-        const userEmail = localStorage.getItem('user.email');
+        const token = localStorage.getItem('jwtToken');
         
-        if (userEmail) {
-            // Create a logout button and display user email
+        if (token) {
+            try {
+            // Decode the JWT token to extract user information
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const userName = payload.name || 'User'; // Assuming the token contains a 'name' field
+
+            // Create a logout button and display user name
             const userInfo = document.createElement('span');
             userInfo.className = 'user-info';
-            userInfo.textContent = `Logged in as: ${userEmail}`;
+            userInfo.textContent = `Logged in as: ${userName}`;
             navButtonsRightContainer.appendChild(userInfo);
 
             const logoutButton = document.createElement('button');
             logoutButton.className = 'nav-button-right';
             logoutButton.textContent = 'Log Out';
             logoutButton.onclick = function() {
-            localStorage.removeItem('user.email');
-            location.reload(); // Reload the page to update the header
+                localStorage.removeItem('jwtToken');
+                location.reload(); // Reload the page to update the header
             };
             navButtonsRightContainer.appendChild(logoutButton);
+            } catch (error) {
+            console.error('Invalid token:', error);
+            localStorage.removeItem('jwtToken'); // Remove invalid token
+            location.reload(); // Reload the page to update the header
+            }
         } else {
             // Create a login button
             const loginButton = document.createElement('button');

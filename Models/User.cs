@@ -122,5 +122,9 @@ namespace ServerSide_HW.Models
                 return Convert.ToBase64String(hash);
             }
         }
+        static public int NewID()
+        {
+            return UsersList.Count + 1;
+        }
     }
 }
