@@ -43,7 +43,7 @@ const HeaderComponent = {
             myMoviesPath = 'html/layout/MyMovies.html';
             AddMoviePath = 'html/layout/AddMovie.html';
             loginPath = 'html/Auth/Login.html';
-        }
+        } // Ensure compatibility with JavaScript
         
         return {
             basePath,
@@ -76,42 +76,58 @@ const HeaderComponent = {
         homeButton.onclick = function() { location.href = paths.indexPath; };
         navButtonsContainer.appendChild(homeButton);
 
-        const myMoviesButton = document.createElement('button');
-        myMoviesButton.className = `nav-button ${currentPage === 'MyMovies.html' ? 'active' : ''}`;
-        myMoviesButton.textContent = 'My Movies';
-        myMoviesButton.onclick = function() { location.href = paths.myMoviesPath; };
-        navButtonsContainer.appendChild(myMoviesButton);
-
-        const AddMovie = document.createElement('button');
-        AddMovie.className = `nav-button ${currentPage === 'AddMovie.html' ? 'active' : ''}`;
-        AddMovie.textContent = 'Add Movies';
-        AddMovie.onclick = function() { location.href = paths.AddMoviePath; };
-        navButtonsContainer.appendChild(AddMovie);
-
-        const userEmail = localStorage.getItem('user.email');
+        const token = localStorage.getItem('jwtToken');
         
-        if (userEmail) {
-            // Create a logout button and display user email
-            const userInfo = document.createElement('span');
-            userInfo.className = 'user-info';
-            userInfo.textContent = `Logged in as: ${userEmail}`;
-            navButtonsRightContainer.appendChild(userInfo);
+        if (token) {
+            try {
+                // Decode the JWT token to extract user information
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                
+                // Check if token is expired
+                const currentTime = Math.floor(Date.now() / 1000);
+                if (payload.exp && payload.exp < currentTime) {
+                    console.warn('Token has expired');
+                    localStorage.removeItem('jwtToken');
+                    showLoginButton(currentPage, paths, navButtonsRightContainer);
+                    return;
+                }
 
-            const logoutButton = document.createElement('button');
-            logoutButton.className = 'nav-button-right';
-            logoutButton.textContent = 'Log Out';
-            logoutButton.onclick = function() {
-            localStorage.removeItem('user.email');
-            location.reload(); // Reload the page to update the header
-            };
-            navButtonsRightContainer.appendChild(logoutButton);
+                // Show "My Movies" and "Add Movies" buttons only if the user is logged in
+                const myMoviesButton = document.createElement('button');
+                myMoviesButton.className = `nav-button ${currentPage === 'MyMovies.html' ? 'active' : ''}`;
+                myMoviesButton.textContent = 'My Movies';
+                myMoviesButton.onclick = function() { location.href = paths.myMoviesPath; };
+                navButtonsContainer.appendChild(myMoviesButton);
+
+                const AddMovie = document.createElement('button');
+                AddMovie.className = `nav-button ${currentPage === 'AddMovie.html' ? 'active' : ''}`;
+                AddMovie.textContent = 'Add Movies';
+                AddMovie.onclick = function() { location.href = paths.AddMoviePath; };
+                navButtonsContainer.appendChild(AddMovie);
+
+                const userName = payload.name || 'User'; // Assuming the token contains a 'name' field
+
+                // Create a logout button and display user name
+                const userInfo = document.createElement('span');
+                userInfo.className = 'user-info';
+                userInfo.textContent = `Logged in as: ${userName}`;
+                navButtonsRightContainer.appendChild(userInfo);
+
+                const logoutButton = document.createElement('button');
+                logoutButton.className = 'nav-button-right';
+                logoutButton.textContent = 'Log Out';
+                logoutButton.onclick = function() {
+                    localStorage.removeItem('jwtToken');
+                    location.reload(); // Reload the page to update the header
+                };
+                navButtonsRightContainer.appendChild(logoutButton);
+            } catch (error) {
+                console.error('Invalid token:', error);
+                localStorage.removeItem('jwtToken'); // Remove invalid token
+                showLoginButton(currentPage, paths, navButtonsRightContainer);
+            }
         } else {
-            // Create a login button
-            const loginButton = document.createElement('button');
-            loginButton.className = `nav-button-right ${currentPage === 'Login.html' ? 'active' : ''}`;
-            loginButton.textContent = 'Login';
-            loginButton.onclick = function() { location.href = paths.loginPath; };
-            navButtonsRightContainer.appendChild(loginButton);
+            showLoginButton(currentPage, paths, navButtonsRightContainer);
         }
 
         // Append the nav buttons container to the header
@@ -141,6 +157,15 @@ const HeaderComponent = {
         }
     }
 };
+
+// Helper function to show login button
+function showLoginButton(currentPage, paths, navButtonsRightContainer) {
+    const loginButton = document.createElement('button');
+    loginButton.className = `nav-button-right ${currentPage === 'Login.html' ? 'active' : ''}`;
+    loginButton.textContent = 'Login';
+    loginButton.onclick = function() { location.href = paths.loginPath; };
+    navButtonsRightContainer.appendChild(loginButton);
+}
 
 // Initialize header when the DOM is ready
 document.addEventListener('DOMContentLoaded', function() {

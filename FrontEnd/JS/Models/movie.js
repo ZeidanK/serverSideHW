@@ -186,7 +186,24 @@ createAddButton: function(movieInstance, index) {
     // Set up click handler
     addBtn.on('click', function() {
         const clickedButton = $(this);
-        
+
+        // Check if JWT token exists and is valid
+        const jwtToken = localStorage.getItem('jwtToken');
+        if (!jwtToken ) {
+            // Redirect to login page if token is missing or expired
+            window.location.href = "Auth/Login.html";
+            return;
+        }
+        // Decode the JWT token to extract user information
+        const payload = JSON.parse(atob(jwtToken.split('.')[1]));
+                
+        // Check if token is expired
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp < currentTime) {
+            console.warn('Token has expired');
+            localStorage.removeItem('jwtToken');
+            return;
+        }
         // Format genres properly as a string, not HTML
         let genresValue = "";
         if (Array.isArray(movieInstance.genres)) {

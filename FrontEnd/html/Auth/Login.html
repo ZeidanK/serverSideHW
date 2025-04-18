@@ -15,7 +15,7 @@
     <script>
         $(document).ready(function() {
             // Check if user is already logged in
-            const userToken = localStorage.getItem('user.email');
+            const userToken = localStorage.getItem('jwtToken');
             if (userToken) {
                 // Redirect to homepage if logged in
                 window.location.href = '../index.html';
@@ -27,22 +27,22 @@
                 event.preventDefault();
     
                 const user = {
-                    id: 1,
-                    name: "exampleName", // Replace with a valid name if needed
+                    name: '',
                     email: $('#email').val(),
                     password: $('#password').val(),
-                    active: true
+                    active: true,
                 };
     
                 // API call to log in the user
                 UserManager.ajaxCall(
                     'POST',
-                   '/api/Users/Login',
-                    
+                    '/api/Users/LoginJWT',
                     JSON.stringify(user),
                     function(response) {
-                        // Store token in localStorage
-                        localStorage.setItem('user.email', user.email);
+                        // Store JWT token in localStorage
+                        if (response.token) {
+                            localStorage.setItem('jwtToken', response.token);
+                        }
     
                         // Redirect to homepage
                         window.location.href = '../index.html';
@@ -55,6 +55,7 @@
             });
         });
     </script>
+
 </head>
 <body>
     <header>
@@ -74,7 +75,7 @@
             <button type="submit" class="auth-btn">Log In</button>
         </form>
         <div class="auth-links">
-            <a href="ForgotPassword.html" class="auth-link">Forgot Password?</a>
+            <!-- <a href="ForgotPassword.html" class="auth-link">Forgot Password?</a> -->
             <a href="Register.html" class="auth-link">Register</a>
         </div>
     </div>
