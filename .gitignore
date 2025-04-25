@@ -3,3 +3,73 @@
 ################################################################################
 
 /.vs/ServerSide-HW
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Logs
+*.log
+logs/
+
+# Visual Studio Code
+.vscode/
+
+# Rider IDE
+.idea/
+*.sln.iml
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+packages/
+.vs/
+
+# DotNet specific
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*.orig
+
+# Generated files
+*.generated.cs
+*.g.cs
+*.g.i.cs
+
+# Coverage reports
+coverage/
+*.coverage
+*.coveragexml
+
+# Publish output
+wwwroot/
+dist/
+node_modules/
+
+# Secrets
+secrets.json
+.env
+.env.*
+
+# Resharper
+_ReSharper.Caches/
+
+# Linux-specific
+*.pid
+
+# Windows-specific
+*.db
