@@ -1,0 +1,689 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <title class="movies-header" >Add New Movie</title>
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+                integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+                crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="../../CSS/Styles.css">
+        <link rel="stylesheet" href="../../CSS/moviesCard.css">
+        <script src="../../JS/Auth/authProtection.js"></script>
+
+        <script src="../../JS/layout/Header.js"></script>
+        <script src="../../JS/Models/movie.js"></script>
+        <style>
+            .form-container {
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: 500;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            .form-control:focus {
+                border-color: #007bff;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            }
+
+            .form-row {
+                display: flex;
+                flex-wrap: wrap;
+                margin: 0 -10px;
+            }
+
+            .form-column {
+                flex: 1;
+                padding: 0 10px;
+                min-width: 200px;
+            }
+
+            .checkbox-group {
+                display: flex;
+                align-items: center;
+            }
+
+            .checkbox-group input[type="checkbox"] {
+                margin-right: 10px;
+            }
+
+            .form-actions {
+                margin-top: 30px;
+                text-align: right;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }
+
+            .btn-primary {
+                background-color: #007bff;
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background-color: #0069d9;
+            }
+
+            .btn-secondary {
+                background-color: #6c757d;
+                color: white;
+                margin-right: 10px;
+            }
+
+            .btn-secondary:hover {
+                background-color: #5a6268;
+            }
+
+            .error-message {
+                color: #dc3545;
+                font-size: 14px;
+                margin-top: 5px;
+                display: none;
+            }
+
+            .invalid-input {
+                border-color: #dc3545;
+            }
+
+            .form-title {
+                margin-bottom: 20px;
+                color: #333;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 15px;
+            }
+
+            /* Movie info preview section */
+            .preview-section {
+                margin-top: 30px;
+                border-top: 1px solid #eee;
+                padding-top: 20px;
+            }
+            
+            .movie-preview {
+                display: flex;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                overflow: hidden;
+                max-height: 300px;
+            }
+            
+            .movie-preview img {
+                width: 200px;
+                height: auto;
+                object-fit: cover;
+            }
+            
+            .preview-details {
+                padding: 15px;
+                overflow-y: auto;
+            }
+            
+            .preview-title {
+                margin-top: 0;
+                margin-bottom: 10px;
+                color: #333;
+            }
+
+            /* Genre dropdown styling */
+    .dropdown-container {
+        position: relative;
+        width: 50%;
+    }
+
+    .dropdown-header {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .dropdown-header:after {
+        content: '▼';
+        font-size: 12px;
+        margin-left: 10px;
+    }
+
+    .dropdown-list {
+        display: none;
+        position: absolute;
+        width: 100%;
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        background-color: #fff;
+        z-index: 10;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .dropdown-list.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 8px 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f5f5f5;
+    }
+
+    .dropdown-item input[type="checkbox"] {
+        margin-right: 10px;
+    }
+
+    .selected-items {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    .selected-tag {
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 4px 8px;
+        margin: 2px;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .selected-tag .remove {
+        margin-left: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+        </style>
+    </head>
+    <body>
+        <header>
+            <!--    Header.js will populate this -->
+        </header>
+
+        <div class="container">
+            <div class="form-container">
+                <h2 class="form-title">Add New Movie</h2>
+                <form id="movieForm">
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="primaryTitle">Movie Title *</label>
+                                <input type="text" class="form-control" id="primaryTitle" name="primaryTitle" required>
+                                <div class="error-message" id="primaryTitle-error">Please enter a movie title</div>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="year">Year *</label>
+                                <input type="number" class="form-control" id="year" name="year" min="1888" max="2030" required>
+                                <div class="error-message" id="year-error">Please enter a valid year (1888-2030)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="primaryImage">Movie Poster URL *</label>
+                                <input type="url" class="form-control" id="primaryImage" name="primaryImage" required>
+                                <div class="error-message" id="primaryImage-error">Please enter a valid URL for the movie poster</div>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="url">Movie Information URL</label>
+                                <input type="url" class="form-control" id="url" name="url">
+                                <div class="error-message" id="url-error">Please enter a valid URL</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="releaseDate">Release Date *</label>
+                                <input type="date" class="form-control" id="releaseDate" name="releaseDate" required>
+                                <div class="error-message" id="releaseDate-error">Please select a release date</div>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="language">Language *</label>
+                                <select class="form-control" id="language" name="language" required>
+                                    <option value="" disabled selected>Select a language</option>
+                                    <option value="English">English</option>
+                                    <option value="Spanish">Spanish</option>
+                                    <option value="French">French</option>
+                                    <option value="German">German</option>
+                                    <option value="Chinese">Chinese</option>
+                                    <option value="Japanese">Japanese</option>
+                                    <option value="Korean">Korean</option>
+                                    <option value="Italian">Italian</option>
+                                    <option value="Russian">Russian</option>
+                                    <option value="Arabic">Arabic</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="Portuguese">Portuguese</option>
+                                </select>
+                                <div class="error-message" id="language-error">Please select a language</div>
+                            </div>
+                        </div>    </div>
+
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="budget">Budget ($)</label>
+                                <input type="number" class="form-control" id="budget" name="budget" min="100000" step="1000" value="100000">
+                                <div class="error-message" id="budget-error">Budget must be at least $100,000</div>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="grossWorldwide">Box Office Worldwide ($)</label>
+                                <input type="number" class="form-control" id="grossWorldwide" name="grossWorldwide" min="0" step="1000" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="genres">Genres</label>
+                                <div class="dropdown-container">
+                                    <div class="dropdown-header" id="genreDropdownHeader">
+                                        Select genres
+                                    </div>
+                                    <div class="dropdown-list" id="genreDropdownList">
+                                        <!-- Will be populated from JS -->
+                                    </div>
+                                </div>
+                                <input type="hidden" id="genres" name="genres">
+                                <div class="selected-items" id="selectedGenres" required></div>
+                                <div class="error-message" id="selectedGenres-error">Please select at least one genra</div>
+                                
+                            </div>
+                        </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="runtimeMinutes">Runtime (minutes) *</label>
+                                <input type="number" class="form-control" id="runtimeMinutes" name="runtimeMinutes" min="1" required>
+                                <div class="error-message" id="runtimeMinutes-error">Please enter a valid runtime</div>
+                            </div>
+                        </div>
+                    
+
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="averageRating">Average Rating</label>
+                                <input type="number" class="form-control" id="averageRating" name="averageRating" min="0" max="10" step="0.1" value="0">
+                                <div class="error-message" id="averageRating-error">Rating must be between 0 and 10</div>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="numVotes">Number of Votes</label>
+                                <input type="number" class="form-control" id="numVotes" name="numVotes" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="isAdult" name="isAdult">
+                        <label for="isAdult">Adult Content</label>
+                    </div>
+                <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="previewButton">Preview</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <button type="submit" class="btn btn-primary">Add Movie</button>
+                    </div>
+                
+                
+                
+
+                    <!-- Preview section - will show a preview of the entered data -->
+                    <div class="preview-section" id="previewSection" style="display: none;">
+                        <h3>Preview</h3>
+                        <div class="movie-preview">
+                            <img id="previewImage" src="" alt="Movie poster preview">
+                            <div class="preview-details">
+                                <h3 id="previewTitle" class="preview-title"></h3>
+                                <p><strong>Year:</strong> <span id="previewYear"></span></p>
+                                <p><strong>Release Date:</strong> <span id="previewReleaseDate"></span></p>
+                                <p><strong>Runtime:</strong> <span id="previewRuntime"></span> minutes</p>
+                                <p><strong>Language:</strong> <span id="previewLanguage"></span></p>
+                                <p><strong>Description:</strong> <span id="previewDescription"></span></p>
+                            </div>
+                        </div>
+                    </div>
+    </div>
+                    
+                </form>
+            </div>
+        </div>
+
+        <script>
+
+    // Populate genres dropdown from the global array
+    function initGenresDropdown() {
+        const dropdownList = $('#genreDropdownList');
+        const dropdownHeader = $('#genreDropdownHeader');
+        const selectedGenresContainer = $('#selectedGenres');
+        const genresInput = $('#genres');
+        let selectedGenres = [];
+        
+        // Toggle dropdown visibility
+        dropdownHeader.on('click', function() {
+            dropdownList.toggleClass('show');
+        });
+        
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.dropdown-container').length) {
+                dropdownList.removeClass('show');
+            }
+        });
+        
+        // Populate dropdown with genres from movie.js
+        if (window.MOVIE_GENRES && Array.isArray(window.MOVIE_GENRES)) {
+            window.MOVIE_GENRES.forEach(genre => {
+                const item = $('<div class="dropdown-item">');
+                const checkbox = $('<input type="checkbox" id="genre-' + genre + '">');
+                const label = $('<label for="genre-' + genre + '">').text(genre);
+                
+                item.append(checkbox);
+                item.append(label);
+                dropdownList.append(item);
+                
+                // Handle checkbox clicks
+                checkbox.on('change', function() {
+                    if (this.checked) {
+                        addGenre(genre);
+                    } else {
+                        removeGenre(genre);
+                    }
+                    updateDropdownHeader();
+                    updateHiddenInput();
+                });
+            });
+        }
+        
+        // Add a genre to the selected list
+        function addGenre(genre) {
+            if (!selectedGenres.includes(genre)) {
+                selectedGenres.push(genre);
+                const tag = $('<span class="selected-tag">').text(genre);
+                const removeBtn = $('<span class="remove">').text('×');
+                
+                removeBtn.on('click', function() {
+                    removeGenre(genre);
+                    $('#genre-' + genre).prop('checked', false);
+                    updateDropdownHeader();
+                    updateHiddenInput();
+                });
+                
+                tag.append(removeBtn);
+                selectedGenresContainer.append(tag);
+            }
+        }
+        
+        // Remove a genre from the selected list
+        function removeGenre(genre) {
+            selectedGenres = selectedGenres.filter(g => g !== genre);
+            selectedGenresContainer.find('.selected-tag').filter(function() {
+                return $(this).text().replace('×', '') === genre;
+            }).remove();
+        }
+        
+        // Update the dropdown header text
+        function updateDropdownHeader() {
+            if (selectedGenres.length === 0) {
+                dropdownHeader.text('Select genres');
+            } else if (selectedGenres.length === 1) {
+                dropdownHeader.text(selectedGenres[0]);
+            } else {
+                dropdownHeader.text(selectedGenres.length + ' genres selected');
+            }
+        }
+        
+        // Update the hidden input with comma-separated genres
+        function updateHiddenInput() {
+            genresInput.val(selectedGenres.join(', '));
+        }
+    }
+
+
+            $(document).ready(function() {
+                initGenresDropdown();
+
+                // Preview button functionality
+                $('#previewButton').on('click', function() {
+                    updatePreview();
+                    $('#previewSection').show();
+                });
+                
+                // Update preview when poster URL changes
+                $('#primaryImage').on('change', function() {
+                    const imageUrl = $(this).val();
+                    if (imageUrl && isValidUrl(imageUrl)) {
+                        $('#previewImage').attr('src', imageUrl);
+                    }
+                });
+                
+                // Form submission handler
+                $('#movieForm').on('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Validate the form
+                    if (validateForm()) {
+                        // Collect form data
+                        const movieData = {
+                            id: randomId(),
+                            url: $('#url').val() || "string",
+                            primaryTitle: $('#primaryTitle').val(),
+                            description: $('#description').val() || "string",
+                            primaryImage: $('#primaryImage').val(),
+                            year: parseInt($('#year').val()),
+                            releaseDate: $('#releaseDate').val(),
+                            language: $('#language').val(),
+                            budget: parseFloat($('#budget').val()) || 100000,
+                            grossWorldwide: parseFloat($('#grossWorldwide').val()) || 0,
+                            //genres: $('#genres').val() || "string",
+                            genres: $('#genres').val().split(', ').filter(g => g.trim() !== '').join(', ') || "no genres",
+                            isAdult: $('#isAdult').is(':checked'),
+                            runtimeMinutes: parseInt($('#runtimeMinutes').val()),
+                            averageRating: parseFloat($('#averageRating').val()) || 0,
+                            numVotes: parseInt($('#numVotes').val()) || 0
+                        };
+                        
+                        // Send the data to the server
+                        submitMovieData(movieData);
+                    }
+                });
+                
+                // Function to validate the form
+                function validateForm() {
+                    let isValid = true;
+                    
+                    // Reset all validation error states
+                    $('.form-control').removeClass('invalid-input');
+                    $('.error-message').hide();
+                    
+                    // Required fields
+                    const requiredFields = ['primaryTitle', 'primaryImage', 'year', 'releaseDate', 'language', 'runtimeMinutes'];
+                    requiredFields.forEach(field => {
+                        const value = $('#' + field).val();
+                        if (!value || (field === 'primaryTitle' && value.trim() === '')) {
+                            showError(field, `write a title not just space characters`);
+                            isValid = false;
+                        }
+                    });    
+                    // Validate year range
+                    const year = parseInt($('#year').val());
+                    if (year < 1888 || year > 2030) {
+                        showError('year', 'Please enter a valid year (1888-2030)');
+                        isValid = false;
+                    }
+                    
+                    // Validate URLs
+                    ['url', 'primaryImage'].forEach(field => {
+                        const value = $('#' + field).val();
+                        if (value && !isValidUrl(value)) {
+                            showError(field, 'Please enter a valid URL');
+                            isValid = false;
+                        }
+                    });
+                    
+                    // Validate budget minimum
+                    const budget = parseFloat($('#budget').val());
+                    if (budget < 100000) {
+                        showError('budget', 'Budget must be at least $100,000');
+                        isValid = false;
+                    }
+                    
+                    // Validate rating range
+                    const rating = parseFloat($('#averageRating').val());
+                    if (rating < 0 || rating > 10) {
+                        showError('averageRating', 'Rating must be between 0 and 10');
+                        isValid = false;
+                    }
+                    
+                    return isValid;
+                }
+                
+                // Function to show error message for a field
+                function showError(fieldId, message) {
+                    $('#' + fieldId).addClass('invalid-input');
+                    const errorElement = $('#' + fieldId + '-error');
+                    if (message) {
+                        errorElement.text(message);
+                    }
+                    errorElement.show();
+                }
+                
+                // Function to validate URLs
+                function isValidUrl(url) {
+                    try {
+                        new URL(url);
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                }
+                
+                // Function to update preview
+                function updatePreview() {
+                    $('#previewTitle').text($('#primaryTitle').val() || 'Movie Title');
+                    $('#previewYear').text($('#year').val() || 'N/A');
+                    // Preview selected genres
+    const selectedGenres = $('#genres').val();
+    const genrePreview = selectedGenres ? selectedGenres : 'Not specified';
+    if (!$('#previewGenres').length) {
+        $('.preview-details').append('<p><strong>Genres:</strong> <span id="previewGenres"></span></p>');
+    }
+    $('#previewGenres').text(genrePreview);
+                    const releaseDate = $('#releaseDate').val();
+                    if (releaseDate) {
+                        const date = new Date(releaseDate);
+                        $('#previewReleaseDate').text(date.toLocaleDateString());
+                    } else {
+                        $('#previewReleaseDate').text('N/A');
+                    }
+                    
+                    $('#previewRuntime').text($('#runtimeMinutes').val() || 'N/A');
+                    $('#previewLanguage').text($('#language').val() || 'N/A');
+                    $('#previewDescription').text($('#description').val() || 'No description available');
+                    
+                    const imageUrl = $('#primaryImage').val();
+                    if (imageUrl && isValidUrl(imageUrl)) {
+                        $('#previewImage').attr('src', imageUrl);
+                    } else {
+                        $('#previewImage').attr('src', 'https://via.placeholder.com/200x300?text=No+Image');
+                    }
+                }
+                
+                function submitMovieData(movieData) {
+                    const jwtToken = localStorage.getItem("jwtToken");
+                    if (jwtToken) {
+                        try {
+                            const payload = JSON.parse(atob(jwtToken.split('.')[1]));
+                            movieData.userId = parseInt(payload.id);
+                        } catch (err) {
+                            alert("Invalid token. Please log in again.");
+                            return;
+                        }
+                    } else {
+                        alert("You must be logged in to add a movie.");
+                        return;
+                    }
+                    
+                    MovieUtils.ajaxCall(
+                        "POST",
+                        "/api/movies",
+                        JSON.stringify(movieData),
+                        function (response) {
+                            if (response === false) {
+                                alert("The movie was not added. Please try again.");
+                            } else {
+                                alert("Success! Movie has been added to the database.");
+                                $('#movieForm')[0].reset();
+                                $('#previewSection').hide();
+                            }
+                        },
+                        function (xhr, status, error) {
+                            console.error("Error details:", xhr.responseText);
+                            alert("Failed to add movie. Please check your input and try again.\nError: " + status);
+                        }
+                    );
+                }
+                
+            });
+
+            // Function to generate a random ID
+            function randomId() {
+                return Math.floor(Math.random() * 1000000);
+            }
+        </script>
+    </body>
+    </html>
