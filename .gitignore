@@ -73,3 +73,6 @@ _ReSharper.Caches/
 
 # Windows-specific
 *.db
+
+# Microsoft package repository configuration file
+packages-microsoft-prod.deb
