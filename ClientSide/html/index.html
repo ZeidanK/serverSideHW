@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>IMDB Movies</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../CSS/Styles.css">
+    <link rel="stylesheet" href="../CSS/moviesCard.css">
+</head>
+<body>
+
+    <header></header>
+
+    <div class="container">
+        <h1 class="movies-header">Movies</h1>
+        <button id="loadMoviesBtn" class="btn">Load Movies</button>
+        <div id="movies-container" class="movie-grid">
+            <!-- Movie cards will be appended here -->
+        </div>
+    </div>
+    <script src="../JS/layout/Header.js"></script>
+
+
+
+    
+
+    <!-- Movie data (fake dataset or list) -->
+    <script src="../JS/ran/movies.js"></script>
+
+    <!-- Movie logic (Movie class, utils, etc.) -->
+    <script src="../JS/Models/movie.js"></script>
+
+    <!-- Page-specific logic -->
+    <script>
+        $(document).ready(function () {
+            $('#loadMoviesBtn').on('click', function () {
+             
+                MovieUtils.initIndexPage();
+            });
+        });
+    </script>
+</body>
+</html>
