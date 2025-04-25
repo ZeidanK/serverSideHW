@@ -14,13 +14,13 @@ namespace ServerSide_HW.Models
         static List<User> UsersList = new List<User>();
         public User(User user)
         {
-            
-                this.Id = user.Id;
-                this.Name = user.Name;
-                this.Email = user.Email;
-                this.Password = user.Password;
-                this.Active = user.Active;
-           
+
+            this.Id = user.Id;
+            this.Name = user.Name;
+            this.Email = user.Email;
+            this.Password = user.Password;
+            this.Active = user.Active;
+
         }
         public User(int id, string name, string email, string password, bool active)
         {
@@ -34,8 +34,6 @@ namespace ServerSide_HW.Models
         {
         }
 
-       
-        
         public int Id
         {
             get => id;
@@ -82,7 +80,7 @@ namespace ServerSide_HW.Models
                 return false;
             }
         }
-        
+
         public bool Register(User user)
         {
             try
@@ -93,7 +91,7 @@ namespace ServerSide_HW.Models
             {
                 throw new Exception("Validation failed");
             }
-            if (UsersList.Any(u => u.Id == user.Id)||UsersList.Any(u=>u.Email==user.Email))
+            if (UsersList.Any(u => u.Id == user.Id) || UsersList.Any(u => u.Email == user.Email))
             {
                 throw new Exception("User already exists");
             }
