@@ -134,15 +134,3 @@ sudo apt-get install -y dotnet-sdk-6.0
 
 Feel free to contribute or raise issues if you encounter any problems!
 ```
-
-### Steps to Add the README File:
-1. Create a new file named `README.md` in the root of your repository.
-2. Copy and paste the above content into the file.
-3. Save the file and commit it to your repository:
-   ```bash
-   git add README.md
-   git commit -m "Add README file with setup instructions"
-   git push
-   ```
-
-Let me know if you need further adjustments!
