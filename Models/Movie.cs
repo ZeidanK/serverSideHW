@@ -2,7 +2,6 @@
 {
     public class Movie
     {
-        // Private fields for the properties
         int id;
         string url;
         string primaryTitle;
@@ -18,13 +17,14 @@
         int runtimeMinutes;
         float averageRating;
         int numVotes;
+        int userId; // a way to save added movies for each user independently  
 
-        static List<Movie> MoviesList = new List<Movie>() ;
+        static Dictionary<int, List<Movie>> UserMovies = new(); 
 
-        // Constructor for the Movie class
+        public Movie() {}
+
         public Movie(int id, string url, string primaryTitle, string description, string primaryImage, int year, DateTime releaseDate, string language, double budget, double grossWorldwide, string genres, bool isAdult, int runtimeMinutes, float averageRating, int numVotes)
         {
-            
             this.id = id;
             this.url = url;
             this.primaryTitle = primaryTitle;
@@ -42,91 +42,76 @@
             this.numVotes = numVotes;
         }
 
+        public int Id { get => id; set => id = value; }
+        public string Url { get => url; set => url = value; }
+        public string PrimaryTitle { get => primaryTitle; set => primaryTitle = value; }
+        public string Description { get => description; set => description = value; }
+        public string PrimaryImage { get => primaryImage; set => primaryImage = value; }
+        public int Year { get => year; set => year = value; }
+        public DateTime ReleaseDate { get => releaseDate; set => releaseDate = value; }
+        public string Language { get => language; set => language = value; }
+        public double Budget { get => budget; set => budget = value; }
+        public double GrossWorldwide { get => grossWorldwide; set => grossWorldwide = value; }
+        public string Genres { get => genres; set => genres = value; }
+        public bool IsAdult { get => isAdult; set => isAdult = value; }
+        public int RuntimeMinutes { get => runtimeMinutes; set => runtimeMinutes = value; }
+        public float AverageRating { get => averageRating; set => averageRating = value; }
+        public int NumVotes { get => numVotes; set => numVotes = value; }
+        public int UserId { get => userId; set => userId = value; } // way to save movies for each user(ID) independently
 
-        public Movie()
+        public bool Insert()
         {
+            try
+            {
+                if (!UserMovies.ContainsKey(userId))
+                    UserMovies[userId] = new List<Movie>();
+                ValidateMovie();
+                
 
+                UserMovies[userId].Add(this);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
-        //next part creating properties for all fields
-        // extra validation is done in the ValidationHelper class
-        // should use camleCase for the properties
 
-        
-public int Id
+        public static List<Movie> Read(int userId)
         {
-            get => id;
-            set => id = value;
+            if (UserMovies.ContainsKey(userId))
+                return UserMovies[userId];
+            return new List<Movie>();
         }
-        public string Url
+
+        public static List<Movie> GetByTitle(int userId, string title)
         {
-            get => url;
-            set => url = value;
+            return Read(userId).Where(m => m.primaryTitle.Contains(title, StringComparison.OrdinalIgnoreCase)).ToList();
         }
-        public string PrimaryTitle
+
+        public static List<Movie> GetByReleaseDate(int userId, DateTime startDate, DateTime endDate)
         {
-            get => primaryTitle;
-            set => primaryTitle = value;
+            return Read(userId).Where(m => m.releaseDate >= startDate && m.releaseDate <= endDate).ToList();
         }
-        public string Description
+
+        public static bool DeleteMovie(int userId, int id)
         {
-            get => description;
-            set => description = value;
+            var userMovies = Read(userId);
+            var movie = userMovies.FirstOrDefault(m => m.Id == id);
+            if (movie != null)
+            {
+                userMovies.Remove(movie);
+                return true;
+            }
+            return false;
         }
-        public string PrimaryImage
-        {
-            get => primaryImage;
-            set => primaryImage = value;
-        }
-        public int Year
-        {
-            get => year;
-            set => year = value;
-        }
-        public DateTime ReleaseDate
-        {
-            get => releaseDate;
-            set => releaseDate = value;
-        }
-        public string Language
-        {
-            get => language;
-            set => language = value;
-        }
-        public double Budget
-        {
-            get => budget;
-            set => budget = value;
-        }
-        public double GrossWorldwide
-        {
-            get => grossWorldwide;
-            set => grossWorldwide = value;
-        }
-        public string Genres
-        {
-            get => genres;
-            set => genres = value;
-        }
-        public bool IsAdult
-        {
-            get => isAdult;
-            set => isAdult = value;
-        }
-        public int RuntimeMinutes
-        {
-            get => runtimeMinutes;
-            set => runtimeMinutes = value;
-        }
-        public float AverageRating
-        {
-            get => averageRating;
-            set => averageRating = value;
-        }
-        public int NumVotes
-        {
-            get => numVotes;
-            set => numVotes = value;
-        }
+
+        //public bool ValidateMovie()
+        //{
+        //    if (string.IsNullOrEmpty(primaryTitle)) throw new Exception("Title required");
+        //    return true;
+        //}
+
 
         public bool ValidateMovie()
         {
@@ -160,7 +145,7 @@ public int Id
             }
             return true;
         }
-      
+
 
         public bool checkValidId(int id)
         {
@@ -168,7 +153,7 @@ public int Id
             {
                 return false;
             }
-            foreach (Movie movie in MoviesList)
+            foreach (Movie movie in UserMovies[userId])
             {
                 if (movie.id == id)
                 {
@@ -184,96 +169,13 @@ public int Id
             {
                 return false;
             }
-            foreach (Movie movie in MoviesList)
+            foreach (Movie movie in UserMovies[userId])
             {
                 if (movie.primaryTitle == title)
                 {
                     return false;
                 }
             }
-            return true;
-        }
-
-        public bool Insert()
-        {
-            
-            try
-            {
-                this.ValidateMovie();
-                MoviesList.Add(this);
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        static public List<Movie> Read()
-        {
-            return MoviesList;
-        }
-
-        static public List<Movie> GetByTitle(string title)
-        {
-            List<Movie> movies = new List<Movie>();
-            foreach (Movie movie in MoviesList)
-            {
-                if (movie.primaryTitle.Contains(title, StringComparison.OrdinalIgnoreCase))
-                {
-                    movies.Add(movie);
-                }
-            }
-            return movies;
-        }
-
-        static public List<Movie> GetByReleaseDate(DateTime startDate, DateTime endDate)
-        {
-            List<Movie> movies = new List<Movie>();
-            foreach (Movie movie in MoviesList)
-            {
-                if (movie.releaseDate >= startDate && movie.releaseDate <= endDate)
-                {
-                    movies.Add(movie);
-                }
-            }
-            return movies;
-        }
-
-        static public bool DeleteMovie(int id)
-        {
-            if (id < 1)
-            {
-                return false;
-            }
-            if(MoviesList.Count == 0)
-            {
-                return false;
-            }
-
-            Movie movieToDelete = MoviesList.FirstOrDefault(m => m.id == id);
-            if (movieToDelete != null)
-            {
-                MoviesList.Remove(movieToDelete);
-                return true;
-            }
-            return false;
-        }
-
-        public bool CreateTestMovies()
-        {
-            Movie movie1 = new Movie(1, "www.movie1.com", "Movie 1", "Description 1", "image1.jpg", 2021, new DateTime(2021, 1, 1), "English", 1000000, 5000000, "Action, Adventure", false, 120, 7.5f, 1000);
-            Movie movie2 = new Movie(2, "www.movie2.com", "Movie 2", "Description 2", "image2.jpg", 2020, new DateTime(2020, 2, 2), "English", 2000000, 6000000, "Drama, Romance", false, 130, 8.0f, 2000);
-            Movie movie3 = new Movie(3, "www.movie3.com", "Movie 3", "Description 3", "image3.jpg", 2019, new DateTime(2019, 3, 3), "Spanish", 3000000, 7000000, "Comedy, Family", false, 140, 6.5f, 3000);
-            Movie movie4 = new Movie(4, "www.movie4.com", "Movie 4", "Description 4", "image4.jpg", 2018, new DateTime(2018, 4, 4), "French", 4000000, 8000000, "Horror, Thriller", true, 150, 7.0f, 4000);
-            Movie movie5 = new Movie(5, "www.movie5.com", "Movie 5", "Description 5", "image5.jpg", 2017, new DateTime(2017, 5, 5), "German", 5000000, 9000000, "Sci-Fi, Fantasy", false, 160, 8.5f, 5000);
-
-            MoviesList.Add(movie1);
-            MoviesList.Add(movie2);
-            MoviesList.Add(movie3);
-            MoviesList.Add(movie4);
-            MoviesList.Add(movie5);
-
             return true;
         }
 

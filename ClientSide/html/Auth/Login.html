@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Movies Cards</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../CSS/Styles.css">
+    <link rel="stylesheet" href="../../CSS/Auth.css">
+
+<!-- SCRIPTS -->
+ 
+    <script src="../../JS/layout/Header.js"></script>
+    <script src="../../JS/Models/User.js"></script>
+</head>
+<body>
+
+    <!-- Header placeholder -->
+    <header></header>
+
+    <div class="auth-container">
+        <h1 class="auth-title">Log In</h1>
+        <form id="loginForm" class="auth-form">
+            <div class="auth-form-group">
+                <label for="email" class="auth-label">Email:</label>
+                <input type="text" id="email" name="email" class="auth-input" required>
+            </div>
+            <div class="auth-form-group">
+                <label for="password" class="auth-label">Password:</label>
+                <input type="password" id="password" name="password" class="auth-input" required>
+            </div>
+            <button type="submit" class="auth-btn">Log In</button>
+        </form>
+        <div class="auth-links">
+            <a href="Register.html" class="auth-link">Register</a>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const userToken = localStorage.getItem('jwtToken');
+            if (userToken) {
+                // Already logged in? Redirect to homepage.
+                window.location.href = '../index.html';
+                return;
+            }
+
+            $('#loginForm').on('submit', function (event) {
+                event.preventDefault();
+
+                const user = {
+                    name: '',
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    active: true
+                };
+
+                UserManager.ajaxCall(
+                    'POST',
+                    '/api/Users/LoginJWT',
+                    JSON.stringify(user),
+                    function (response) {
+                        console.log(response);
+                        if (response.Token) {
+                            localStorage.setItem('jwtToken', response.Token);
+                            window.location.href = '../index.html'; // Redirect after login
+                        } else {
+                            alert('Invalid token received');
+                        }
+                    },
+                    function (error) {
+                        console.error('Login failed:', error);
+                        alert(error.responseJSON?.message || 'Login failed. Please try again.');
+                    }
+                );
+            });
+        });
+    </script>
+
+</body>
+</html>

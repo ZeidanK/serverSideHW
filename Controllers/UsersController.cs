@@ -3,10 +3,9 @@ using ServerSide_HW.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.IdentityModel.Tokens; // Add this namespace for SymmetricSecurityKey
-using System.IdentityModel.Tokens.Jwt; // Add this namespace for JwtSecurityToken and JwtSecurityTokenHandler
-using System.Security.Claims; // Add this namespace for Claim
-//Install - Package System.IdentityModel.Tokens.Jwt
+using Microsoft.IdentityModel.Tokens; // namespace for SymmetricSecurityKey
+using System.IdentityModel.Tokens.Jwt; //  namespace for JwtSecurityToken and JwtSecurityTokenHandler
+using System.Security.Claims; //  namespace for Claim
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -17,11 +16,12 @@ namespace ServerSide_HW.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+
         // GET: api/<UsersController>
         [HttpGet]
         public IEnumerable<User> Get()
         {
-            
+
             List<User> users = Models.User.Read();
             return users;
         }
@@ -37,13 +37,13 @@ namespace ServerSide_HW.Controllers
         [HttpPost]
         public bool Post([FromBody] User user)
         {
-            if(user == null)
+            if (user == null)
             {
                 return false;// BadRequest();
             }
             else
             {
-               return user.Insert();
+                return user.Insert();
             }
         }
 
@@ -54,9 +54,9 @@ namespace ServerSide_HW.Controllers
             if (user == null)
             {
                 return false;// BadRequest();
-                
+
             }
-            
+
             else
             {
                 user.Id = Models.User.NewID();
@@ -69,7 +69,7 @@ namespace ServerSide_HW.Controllers
                     return false;
                 }
                 user.Password = Models.User.HashPassword(user.Password);
-                
+
                 return user.Insert();
             }
 
@@ -124,31 +124,42 @@ namespace ServerSide_HW.Controllers
             }
 
             // Generate JWT token
-            var token = GenerateJwtToken(existingUser);
+            var Token = GenerateJwtToken(existingUser);
 
-            return Ok(new { Token = token });
+            return Ok(new Dictionary<string, string> { { "Token", Token } });
+        }
+
+        private readonly IConfiguration _config;
+
+        public UsersController(IConfiguration config)
+        {
+            _config = config;
         }
 
         private string GenerateJwtToken(User user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSecretKeyHere")); // Replace with a secure key
-            
+            var key = _config["Jwt:Key"];
+            var issuer = _config["Jwt:Issuer"];
+            var audience = _config["Jwt:Audience"];
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("id", user.Id.ToString()),
-                new Claim("name", user.Name)
-            };
+        new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+        new Claim("id", user.Id.ToString()),
+        new Claim("name", user.Name),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
 
             var token = new JwtSecurityToken(
-                issuer: "YourIssuer",
-                audience: "YourAudience",
+                issuer: issuer,
+                audience: audience,
                 claims: claims,
                 expires: DateTime.Now.AddHours(1),
-                signingCredentials: credentials);
+                signingCredentials: credentials
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

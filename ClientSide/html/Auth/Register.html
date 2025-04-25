@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Movies Cards</title>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../../CSS/Styles.css">  
+    <link rel="stylesheet" href="../../CSS/Auth.css">   
+    <script src="../../JS/Models/User.js"></script>
+    <script src="../../JS/layout/Header.js"></script>
+</head>
+<body>
+    <header>
+        
+    </header>
+    <div class="auth-container">
+        <h1 class="auth-title">Create Account</h1>
+        <form id="registerForm" class="auth-form">
+            <div id="register-message" class="auth-message"></div>
+            
+            <div class="auth-form-group">
+                <label for="name" class="auth-label">Full Name:</label>
+                <input type="text" id="name" name="name" class="auth-input" pattern="[A-Za-z]{2,}" title="Name must contain only letters and be at least 2 characters long" required>
+            </div>
+            
+            <div class="auth-form-group">
+                <label for="email" class="auth-label">Email:</label>
+                <input type="email" id="email" name="email" class="auth-input" required>
+            </div>
+            
+            <div class="auth-form-group">
+                <label for="password" class="auth-label">Password:</label>
+                <input type="password" id="password" name="password" class="auth-input" pattern="(?=.*[0-9])(?=.*[A-Z]).{8,}" title="Password must be at least 8 characters long, contain at least one number and one uppercase letter" required>
+                <div class="password-requirements">
+                    Password must be at least 8 characters, contain at least one number and one uppercase letter.
+                </div>
+            </div>
+            <div class="auth-form-group">
+                <label for="confirmPassword" class="auth-label">Confirm Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="auth-input" required>
+            </div>
+            
+            <button type="submit" class="auth-btn">Register</button>
+        </form>
+        <div class="auth-links">
+            <span>Already have an account?</span>
+            <a href="Login.html" class="auth-link">Login</a>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Form submission handler
+            $('#registerForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Clear any previous messages
+                $('#register-message').removeClass('error success').text('');
+                
+                // Get form data
+                const name = $('#name').val().trim();
+                const email = $('#email').val().trim();
+                const password = $('#password').val();
+                const confirmPassword = $('#confirmPassword').val();
+                
+                // Basic validation
+                if (!name || !email || !password) {
+                    showMessage('Please fill in all required fields', 'error');
+                    return;
+                }
+                
+                if (!isValidEmail(email)) {
+                    showMessage('Please enter a valid email address', 'error');
+                    return;
+                }
+                
+                if (password.length < 8) {
+                    showMessage('Password must be at least 8 characters', 'error');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    showMessage('Passwords do not match', 'error');
+                    return;
+                }
+                
+                // Prepare user object for registration
+                const user = {
+                    name: name,
+                    email: email,
+                    password: password,
+                    active: true
+                };
+                
+                // Show loading state
+                const submitBtn = $(this).find('button[type="submit"]');
+                const originalBtnText = submitBtn.text();
+                submitBtn.prop('disabled', true).text('Registering...');
+                
+                // Call the register function from UserManager
+                try {
+                    // Convert the user object to JSON string for the API call
+                    const userData = JSON.stringify(user);
+                    
+                    UserManager.ajaxCall(
+                        'POST', 
+                        '/api/Users/Register', 
+                        userData,
+                        function(response) {
+                            // Success callback
+                            showMessage('Registration successful! Redirecting to login...', 'success');
+                            
+                            // Store user email in localStorage as per your UserManager implementation
+                            localStorage.setItem('user.email', user.email);
+                            
+                            // Redirect to login page after a short delay
+                            setTimeout(function() {
+                                window.location.href = 'Login.html';
+                            }, 2000);
+                        },
+                        function(error) {
+                            // Error callback
+                            console.error('Registration failed:', error);
+                            showMessage(error.responseJSON?.message || 'Registration failed. Please try again.', 'error');
+                            submitBtn.prop('disabled', false).text(originalBtnText);
+                        }
+                    );
+                } catch (err) {
+                    console.error('Error during registration:', err);
+                    showMessage('An unexpected error occurred', 'error');
+                    submitBtn.prop('disabled', false).text(originalBtnText);
+                }
+            });
+            
+            // Helper function to validate email format
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+            
+            // Helper function to show messages
+            function showMessage(message, type) {
+                const messageElement = $('#register-message');
+                messageElement.removeClass('error success').addClass(type).text(message);
+                
+                // Scroll to message if not visible
+                if (!isElementInViewport(messageElement[0])) {
+                    messageElement[0].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+            
+            // Helper function to check if element is in viewport
+            function isElementInViewport(el) {
+                const rect = el.getBoundingClientRect();
+                return (
+                    rect.top >= 0 &&
+                    rect.left >= 0 &&
+                    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+                );
+            }
+        });
+    </script>
+    
+    <style>
+        /* Additional styles for the registration page */
+        .auth-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .auth-message.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+            display: block;
+        }
+        
+        .auth-message.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+            display: block;
+        }
+        
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Increase spacing between form groups */
+        .auth-form-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</html>
