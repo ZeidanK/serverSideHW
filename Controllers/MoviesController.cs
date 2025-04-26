@@ -76,6 +76,27 @@ namespace ServerSide_HW.Controllers
             }
         }
 
+        [HttpPost("addNewMovie")]
+        public ActionResult<int> PostDB([FromBody] Movie movie)
+        {
+            DBservices dBservices = new DBservices();
+            return(dBservices.Insert(movie));
+            //var userId = GetUserIdFromToken();
+            //if (userId == null)
+            //    return Unauthorized("User ID not found in token");
+
+            //try
+            //{
+            //    movie.UserId = userId.Value; // Assign userId to the movie
+            //    return Ok(movie.Insert());   // Use instance method
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e);
+            //    return BadRequest(e.Message);
+            //}
+        }
+
         [HttpDelete("{id}")]
         public ActionResult<bool> Delete(int id)
         {
