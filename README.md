@@ -97,19 +97,23 @@ sudo apt-get install -y dotnet-sdk-6.0
 
 ## Setting Up the SQL Database
 
-1. **Create the Database**  
-   Use your SQL Server to create a new database for the project.
+1. **Install Azure Data Studio**  
+   Since the project uses a remote SQL server, you can use Azure Data Studio as an alternative. Follow the instructions to install Azure Data Studio for Linux:  
+   [Install Azure Data Studio](https://learn.microsoft.com/en-us/azure-data-studio/download-azure-data-studio?tabs=linux-install%2Cwin-user-install%2Cubuntu-install%2Clinux-uninstall%2Cubuntu-uninstall)
 
-2. **Update Connection String**  
-   Update the `appsettings.json` file with your database connection string:
+2. **Create the Database**  
+   Use Azure Data Studio to connect to your Azure SQL Server and create a new database for the project.
+
+3. **Update Connection String**  
+   Update the `appsettings.json` file with your Azure SQL database connection string:
 
    ```json
    "ConnectionStrings": {
-       "DefaultConnection": "Server=YOUR_SERVER;Database=YOUR_DATABASE;User Id=YOUR_USER;Password=YOUR_PASSWORD;"
+       "DefaultConnection": "Server=tcp:YOUR_AZURE_SERVER.database.windows.net,1433;Database=YOUR_DATABASE;User Id=YOUR_USER@YOUR_AZURE_SERVER;Password=YOUR_PASSWORD;"
    }
    ```
 
-3. **Apply Migrations**  
+4. **Apply Migrations**  
    Run the following command to apply migrations and set up the database schema:
 
    ```bash
