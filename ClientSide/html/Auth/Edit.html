@@ -54,21 +54,7 @@
                 return;
             }
 
-            // Pre-fill form with user details (mock example, replace with actual API call)
-            UserManager.ajaxCall(
-                'GET',
-                '/api/Users/GetProfile',
-                null,
-                function (response) {
-                    $('#username').val(response.name);
-                    $('#email').val(response.email);
-                },
-                function (error) {
-                    console.error('Failed to fetch user details:', error);
-                    alert('Failed to load profile details.');
-                },
-                { Authorization: `Bearer ${userToken}` }
-            );
+            
 
             $('#editProfileForm').on('submit', function (event) {
                 event.preventDefault();
@@ -88,10 +74,9 @@
                         window.location.href = '../index.html'; // Redirect after update
                     },
                     function (error) {
-                        console.error('Update failed:', error);
+                        console.error('Update zzzz failed:', error);
                         alert(error.responseJSON?.message || 'Update failed. Please try again.');
-                    },
-                    { Authorization: `Bearer ${userToken}` }
+                    }
                 );
             });
             // Bind click event to the Test Claims button
