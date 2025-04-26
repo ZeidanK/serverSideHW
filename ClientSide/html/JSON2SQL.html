@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>IMDB Movies</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../CSS/Styles.css">
+    <link rel="stylesheet" href="../CSS/moviesCard.css">
+</head>
+<body>
+
+    <header></header>
+
+    <div class="container">
+        <h1 class="movies-header">Movies</h1>
+        <button id="loadMoviesBtn" class="btn">Load Movies</button>
+        <div id="movies-container" class="movie-grid">
+            <!-- Movie cards will be appended here -->
+        </div>
+    </div>
+    <script src="../JS/layout/Header.js"></script>
+
+
+
+    
+
+    <!-- Movie data (fake dataset or list) -->
+    <script src="../JS/ran/movies.js"></script>
+
+    
+
+    <!-- Page-specific logic -->
+    <script>
+               const port = "7026";
+ const address = "https://localhost:"
+        const  NewList= movies.map(movie => ({
+            id: 0,
+            url: movie.url,
+            primaryTitle: movie.primaryTitle,
+            description: movie.description,
+            primaryImage: movie.primaryImage,
+            year: movie.year,
+            releaseDate: movie.releaseDate,
+            language: movie.language,
+            budget: movie.budget,
+            grossWorldwide: movie.grossWorldwide,
+            genres: movie.genres,
+            isAdult: movie.isAdult,
+            runtimeMinutes: movie.runtimeMinutes,
+            averageRating: movie.averageRating,
+            numVotes: movie.numVotes,
+            
+        }));
+        console.log(NewList);
+
+        $(document).ready(function () {
+            $('#loadMoviesBtn').on('click', function () {
+            // Show loading state
+            const btn = $(this);
+            btn.prop('disabled', true).text('Loading...');
+            
+            // Clean and validate the data more thoroughly
+            const validatedList = NewList.map(movie => {
+                // Handle all fields explicitly to avoid type errors
+                const cleanedMovie = {
+                id: 0,
+                url: movie.url || "",
+                primaryTitle: movie.primaryTitle || "",
+                description: movie.description || "",
+                primaryImage: movie.primaryImage || "",
+                year: typeof movie.year === 'number' ? movie.year : 0,
+                releaseDate: movie.releaseDate || null,
+                language: movie.language || "",
+                genres: movie.genres ? movie.genres.join(', ') : "",
+                isAdult: Boolean(movie.isAdult),
+                runtimeMinutes: typeof movie.runtimeMinutes === 'number' ? movie.runtimeMinutes : 0,
+                averageRating: typeof movie.averageRating === 'number' ? movie.averageRating : 0,
+                numVotes: typeof movie.numVotes === 'number' ? movie.numVotes : 0
+                };
+                
+                // Handle budget specifically
+                if (typeof movie.budget === 'number') {
+                cleanedMovie.budget = movie.budget;
+                } else if (movie.budget && !isNaN(parseFloat(movie.budget))) {
+                cleanedMovie.budget = parseFloat(movie.budget);
+                } else {
+                cleanedMovie.budget = 0;
+                }
+                
+                // Handle grossWorldwide similarly
+                if (typeof movie.grossWorldwide === 'number') {
+                cleanedMovie.grossWorldwide = movie.grossWorldwide;
+                } else if (movie.grossWorldwide && !isNaN(parseFloat(movie.grossWorldwide))) {
+                cleanedMovie.grossWorldwide = parseFloat(movie.grossWorldwide);
+                } else {
+                cleanedMovie.grossWorldwide = 0;
+                }
+                
+                return cleanedMovie;
+            });
+            
+            let completedRequests = 0;
+            const totalRequests = validatedList.length;
+
+            validatedList.forEach(movie => {
+                ajaxCall('POST', '/api/movies/addNewMovie', JSON.stringify(movie), 
+                function (response) {
+                    console.log("Movie loaded successfully:", response);
+                    completedRequests++;
+                    if (completedRequests === totalRequests) {
+                    alert("All movies loaded successfully!");
+                    btn.prop('disabled', false).text('Load Movies');
+                    }
+                }, 
+                function (error) {
+                    console.error("Error loading movie:", error);
+                    let errorMessage = "Failed to load a movie. ";
+                    if (error.status) {
+                    errorMessage += `Status: ${error.status} - ${error.statusText}. `;
+                    }
+                    if (error.responseText) {
+                    try {
+                        const errorObj = JSON.parse(error.responseText);
+                        errorMessage += `Details: ${JSON.stringify(errorObj, null, 2)}`;
+                    } catch (e) {
+                        errorMessage += `Details: ${error.responseText}`;
+                    }
+                    }
+                    alert(errorMessage);
+                    completedRequests++;
+                    if (completedRequests === totalRequests) {
+                    btn.prop('disabled', false).text('Load Movies');
+                    }
+                });
+            });
+            });
+        });
+       
+
+        function ajaxCall(method, api, data, successCB, errorCB) {
+            const jwtToken = localStorage.getItem('jwtToken');
+    
+            $.ajax({
+                type: method,
+                url: `${address}${port}${api}`,
+                data: data,
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                headers: jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {},
+                success: successCB,
+                error: errorCB
+            });
+        }
+    </script>
+</body>
+</html>

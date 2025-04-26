@@ -43,7 +43,9 @@ namespace ServerSide_HW.Controllers
             }
             else
             {
-                return user.Insert();
+                DBservices dBservices = new DBservices();
+                int res =dBservices.Insert(user);
+                return res>0;
             }
         }
 
@@ -69,8 +71,10 @@ namespace ServerSide_HW.Controllers
                     return false;
                 }
                 user.Password = Models.User.HashPassword(user.Password);
-
-                return user.Insert();
+                DBservices dBservices = new DBservices();
+                int res = dBservices.Insert(user);
+                return res > 0;
+                //return user.Insert();
             }
 
         }
