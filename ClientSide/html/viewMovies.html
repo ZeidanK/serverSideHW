@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../JS/Models/movie.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"></script>
+
+      <link rel="stylesheet" href="../../CSS/Styles.css">
+      <link rel="stylesheet" href="../../CSS/moviesCard.css">
+
+      <script src="../JS/layout/Header.js"></script>
+    <title>Search Movies</title>
+    <style>
+       
+        .pagination {
+            margin: 20px 0;
+            text-align: center;
+        }
+        #clearFiltersBtn {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header></header>
+    <h1>Search Movies</h1>
+    <form id="searchForm" style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <div>
+            <label for="searchTerm">Search Term:</label><br>
+            <input type="text" id="searchTerm" name="searchTerm" class="modern-input">
+        </div>
+        <div>
+            <label for="releaseDateFrom">Release Date From:</label><br>
+            <input type="date" id="releaseDateFrom" name="releaseDateFrom" class="modern-input">
+        </div>
+        <div>
+            <label for="releaseDateTo">Release Date To:</label><br>
+            <input type="date" id="releaseDateTo" name="releaseDateTo" class="modern-input">
+        </div>
+        <div>
+            <button type="button" id="clearFiltersBtn" class="modern-button">Clear Filters</button>
+        </div>
+    </form>
+
+    <div id="resultsInfo">
+        <span id="totalCount">Total Found: 0</span>
+        <span id="currentPage">Page: 1</span>
+    </div>
+
+    <!-- Top Pagination -->
+    <div id="topPagination" class="pagination">
+        <button id="prevPageBtnTop" class="modern-button" disabled>Previous Page</button>
+        <button id="nextPageBtnTop" class="modern-button">Next Page</button>
+    </div>
+
+    <!-- Movies will be displayed here as cards -->
+    <div id="movies-container" class="movie-grid">
+        
+        <!-- Cards will be appended here -->
+    </div>
+
+    <!-- Bottom Pagination -->
+    <div id="bottomPagination" class="pagination">
+        <button id="prevPageBtnBottom" class="modern-button" disabled>Previous Page</button>
+        <button id="nextPageBtnBottom" class="modern-button">Next Page</button>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let debounceTimer;
+        const pageSize = 10; // Fixed page size
+
+        // Function to update pagination buttons state
+        function updatePagination(totalCount) {
+            document.getElementById('prevPageBtnTop').disabled = currentPage === 1;
+            document.getElementById('prevPageBtnBottom').disabled = currentPage === 1;
+            const disableNext = currentPage * pageSize >= totalCount;
+            document.getElementById('nextPageBtnTop').disabled = disableNext;
+            document.getElementById('nextPageBtnBottom').disabled = disableNext;
+        }
+        
+        // Bind events for pagination buttons
+        $('#nextPageBtnTop, #nextPageBtnBottom').on('click', function() {
+            currentPage++;
+            searchMovies();
+        });
+        
+        $('#prevPageBtnTop, #prevPageBtnBottom').on('click', function() {
+            if(currentPage > 1) {
+                currentPage--;
+                searchMovies();
+            }
+        });
+
+        // Debounce search on input change
+        $('#searchForm input').on('input change', function() {
+            currentPage = 1;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(searchMovies, 500);
+        });
+
+        // Clear filters button handler
+        $('#clearFiltersBtn').on('click', function() {
+            $('#searchTerm, #releaseDateFrom, #releaseDateTo').val('');
+            currentPage = 1;
+            searchMovies();
+        });
+
+        function searchMovies() {
+            const searchTerm = document.getElementById('searchTerm').value || "";
+            const releaseDateFrom = document.getElementById('releaseDateFrom').value;
+            const releaseDateTo = document.getElementById('releaseDateTo').value;
+
+            // Build query string for GET request
+            let queryParams = new URLSearchParams();
+            if(searchTerm !== "") queryParams.append("searchTerm", searchTerm);
+            if(releaseDateFrom !== "") queryParams.append("releaseDateFrom", releaseDateFrom);
+            if(releaseDateTo !== "") queryParams.append("releaseDateTo", releaseDateTo);
+            queryParams.append("pageNumber", currentPage);
+            queryParams.append("pageSize", pageSize);
+
+            $.ajax({
+                type: "GET",
+                url: `https://localhost:7026/api/Movies/search?${queryParams.toString()}`,
+                contentType: "application/json",
+                success: function(response) {
+                    console.log("API Response:", response);
+                    
+                    let movies = [];
+                    if(Array.isArray(response)) {
+                        movies = response;
+                    } else if(response && Array.isArray(response.movies)) {
+                        movies = response.movies;
+                    } else if(response && Array.isArray(response.Movies)) {
+                        movies = response.Movies;
+                    } else if(response && response.data && Array.isArray(response.data)) {
+                        movies = response.data;
+                    } else if(response && typeof response === 'object') {
+                        movies = [response];
+                    }
+                    
+                    // Update total count and page info
+                    const totalCount = response.totalCount || movies.length || 0;
+                    document.getElementById('totalCount').textContent = `Total Found: ${totalCount}`;
+                    document.getElementById('currentPage').textContent = `Page: ${currentPage}`;
+                    
+                    // Use MovieUtils.displayMovies to create and show movie cards
+                    const container = $('#movies-container');
+                    container.empty();
+                    if(movies.length === 0) {
+                        container.html('<div style="text-align: center; padding: 20px;">No movies found</div>');
+                    } else {
+                        // For each movie, create a card and append it to the container
+                        $.each(movies, function(index, movie) {
+                            const card = MovieUtils.createMovieCard(movie, index, false);
+                            container.append(card);
+                        });
+                    }
+                    updatePagination(totalCount);
+                },
+                error: function(error) {
+                    console.error("Error details:", error);
+                    const container = $('#movies-container');
+                    container.empty();
+                    container.html('<div style="text-align: center; padding: 20px; background-color: #fff3cd; color: #856404;">No movies found with the selected filters</div>');
+                    document.getElementById('totalCount').textContent = 'Total Found: 0';
+                    document.getElementById('currentPage').textContent = 'Page: 1';
+                    updatePagination(0);
+                }
+            });
+        }
+        
+        $(document).ready(function(){
+            searchMovies();
+        });
+    </script>
+</body>
+<style>
+   
+
+    h1 {
+        text-align: center;
+        color: #444;
+    }
+
+    .modern-input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .modern-button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+
+    .modern-button:hover {
+        background-color: #0056b3;
+    }
+
+    .modern-button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .pagination {
+        margin: 20px 0;
+        text-align: center;
+    }
+
+   
+</style>
+</html>

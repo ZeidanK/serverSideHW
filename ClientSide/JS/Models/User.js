@@ -9,11 +9,11 @@ class User {
         this.active = active;
     }
 }
-const port = "";
-const address = "https://proj.ruppin.ac.il/cgroup4/test2/tar1";
+// const port = "";
+// const address = "https://proj.ruppin.ac.il/cgroup4/test2/tar1";
 
-// const port = "7062";
-// const address = "https://localhost:"
+const port = "7026";
+const address = "https://localhost:"
 
 /**
  * User authentication and session management
