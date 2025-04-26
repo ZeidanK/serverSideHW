@@ -200,35 +200,26 @@ namespace ServerSide_HW.Controllers
                 return NotFound("User not found.");
             }
 
+            //var Token = GenerateJwtToken(existingUser);
+
             // Update user details
             existingUser.Name = updatedUser.Name ?? existingUser.Name;
             if (!string.IsNullOrEmpty(updatedUser.Password))
             {
                 existingUser.Password = Models.User.HashPassword(updatedUser.Password);
             }
-
+            var Token = GenerateJwtToken(existingUser);
             int result = dBservices.UpdateUser(existingUser);
 
             if (result > 0)
             {
-                return Ok("Profile updated successfully.");
+                return Ok(new { message = "Profile updated successfully." });
             }
 
             return StatusCode(500, "An error occurred while updating the profile.");
         }
 
 
-        //// PUT api/<UsersController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<UsersController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
 
         private string GetEmailFromToken()
         {
