@@ -17,6 +17,8 @@
         int runtimeMinutes;
         float averageRating;
         int numVotes;
+        int priceToRent;
+        int rentalCount;
         int userId; // a way to save added movies for each user independently  
 
         static Dictionary<int, List<Movie>> UserMovies = new(); 
@@ -59,6 +61,8 @@
         public int NumVotes { get => numVotes; set => numVotes = value; }
         public int UserId { get => userId; set => userId = value; } // way to save movies for each user(ID) independently
 
+        public int PriceToRent { get => priceToRent; set => priceToRent = value; }
+        public int RentalCount { get => rentalCount; set => rentalCount = value; }
         public bool Insert()
         {
             try

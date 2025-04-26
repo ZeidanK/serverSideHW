@@ -35,6 +35,48 @@ public class DBservices
         con.Open();
         return con;
     }
+    //--------------------------------------------------------------------------------------------------
+    // This method rents a movie for the user 
+    //--------------------------------------------------------------------------------------------------
+    public int RentMovie(int userId, int movieId,DateOnly rentStart,DateOnly rentEnd,int totalPrice)
+    {
+        SqlConnection con;
+        SqlCommand cmd;
+        try
+        {
+            con = connect("myProjDB"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@userId", userId);
+        paramDic.Add("@movieId", movieId);
+        paramDic.Add("@rentStart", rentStart);
+        paramDic.Add("@rentEnd", rentEnd);
+        paramDic.Add("@totalPrice", totalPrice);
+        cmd = CreateCommandWithStoredProcedureGeneral("SP_Movies2025_RentMovie", con, paramDic);         // create the command
+        try
+        {
+            int numEffected = cmd.ExecuteNonQuery(); // execute the command
+            return numEffected;
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+    }
 
 
     //--------------------------------------------------------------------------------------------------
@@ -147,6 +189,16 @@ public class DBservices
 
     }
 
+    //---------------------------------------------------------------------------------
+    // get all movies with filters
+    //---------------------------------------------------------------------------------
+
+
+
+
+
+
+
 
     //---------------------------------------------------------------------------------
     // Create the SqlCommand
@@ -173,6 +225,94 @@ public class DBservices
 
 
         return cmd;
+    }
+    //--------------------------------------------------------------------------------------------------
+    // This method searches for movies with filters and pagination
+    //--------------------------------------------------------------------------------------------------
+    public (List<Movie>, int) SearchMovies(string searchTerm, DateTime? releaseDateFrom, DateTime? releaseDateTo, int pageNumber, int pageSize)
+    {
+        SqlConnection con;
+        SqlCommand cmd;
+        SqlDataReader reader = null;
+        List<Movie> movies = new List<Movie>();
+        int totalCount = 0;
+
+        try
+        {
+            con = connect("myProjDB"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>
+        {
+            { "@searchTerm", string.IsNullOrEmpty(searchTerm) ? DBNull.Value : searchTerm },
+            { "@releaseDateFrom", releaseDateFrom.HasValue ? releaseDateFrom.Value : DBNull.Value },
+            { "@releaseDateTo", releaseDateTo.HasValue ? releaseDateTo.Value : DBNull.Value },
+            { "@pageNumber", pageNumber },
+            { "@pageSize", pageSize }
+        };
+
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_Movies2025_Search", con, paramDic); // create the command
+
+        try
+        {
+            reader = cmd.ExecuteReader();
+
+            // Read movies
+            while (reader.Read())
+            {
+                Movie movie = new Movie
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    PrimaryTitle = reader["primaryTitle"].ToString(),
+                    Description = reader["description"].ToString(),
+                    PrimaryImage = reader["primaryImage"].ToString(),
+                    Url = reader["url"].ToString(),
+                    Year = Convert.ToInt32(reader["year"]),
+                    ReleaseDate = Convert.ToDateTime(reader["releaseDate"]),
+                    Language = reader["language"].ToString(),
+                    Budget = Convert.ToDouble(reader["budget"]),
+                    GrossWorldwide = Convert.ToDouble(reader["grossWorldwide"]),
+                    Genres = reader["genres"].ToString(),
+                    IsAdult = Convert.ToBoolean(reader["isAdult"]),
+                    RuntimeMinutes = Convert.ToInt32(reader["runtimeMinutes"]),
+                    AverageRating = Convert.ToSingle(reader["averageRating"]),
+                    NumVotes = Convert.ToInt32(reader["numVotes"]),
+                    UserId = Convert.ToInt32(reader["userId"]),
+                    PriceToRent = Convert.ToInt32(reader["priceToRent"]),
+                    RentalCount = Convert.ToInt32(reader["rentalCount"])
+                };
+                movies.Add(movie);
+            }
+
+            // Move to the next result set to get the total count
+            if (reader.NextResult() && reader.Read())
+            {
+                totalCount = Convert.ToInt32(reader["totalCount"]);
+            }
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                reader.Close();
+            }
+            if (con != null)
+            {
+                con.Close();
+            }
+        }
+
+        return (movies, totalCount);
     }
 
 
