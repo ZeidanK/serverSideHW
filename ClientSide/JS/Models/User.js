@@ -20,6 +20,8 @@ const address = "https://localhost:"
  */
 const UserManager = {
     ajaxCall: function(method, api, data, successCB, errorCB) {
+        const jwtToken = localStorage.getItem('jwtToken');
+
         $.ajax({
             type: method,
             url: `${address}${port}${api}`,
@@ -27,6 +29,7 @@ const UserManager = {
             cache: false,
             contentType: "application/json",
             dataType: "json",
+            headers: jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {},
             success: successCB,
             error: errorCB
         });
