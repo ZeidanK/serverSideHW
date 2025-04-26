@@ -315,6 +315,122 @@ public class DBservices
         return (movies, totalCount);
     }
 
+    //--------------------------------------------------------------------------------------------------  
+    // This method retrieves user information based on email, id, or username  
+    //--------------------------------------------------------------------------------------------------  
+    public User GetUser(string email = null, int? id = null, string userName = null)
+    {
+        SqlConnection con;
+        SqlCommand cmd;
+        SqlDataReader reader = null;
+        User user = null;
+
+        try
+        {
+            con = connect("myProjDB"); // create the connection  
+        }
+        catch (Exception ex)
+        {
+            // write to log  
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>
+       {
+           { "@id", id.HasValue ? id.Value : DBNull.Value },
+           { "@userName", string.IsNullOrEmpty(userName) ? DBNull.Value : userName },
+           { "@Email", string.IsNullOrEmpty(email) ? DBNull.Value : email }
+       };
+
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_Users2025_Get", con, paramDic); // create the command  
+
+        try
+        {
+            reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                user = new User
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    Name = reader["userName"].ToString(),
+                    Email = reader["email"].ToString(),
+                    Password = reader["password"].ToString(),
+                    Active = false
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            // write to log  
+            throw (ex);
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                reader.Close();
+            }
+            if (con != null)
+            {
+                con.Close();
+            }
+        }
+
+        return user;
+    }
+
+    //--------------------------------------------------------------------------------------------------  
+    // This method updates a user's profile in the database  
+    //--------------------------------------------------------------------------------------------------  
+    public int UpdateUser(User user)
+    {
+        SqlConnection con;
+        SqlCommand cmd;
+
+        try
+        {
+            con = connect("myProjDB"); // create the connection  
+        }
+        catch (Exception ex)
+        {
+            // write to log  
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>
+       {
+           { "@id", user.Id },
+           { "@email", user.Email },
+           { "@userName", user.Name },
+           { "@firstName", DBNull.Value }, // Assuming firstName is not part of the User class  
+           { "@lastName", DBNull.Value },  // Assuming lastName is not part of the User class  
+           { "@password", string.IsNullOrEmpty(user.Password) ? DBNull.Value : user.Password },
+           { "@birthDate", DBNull.Value }  // Assuming birthDate is not part of the User class  
+       };
+
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_Users2025_Update", con, paramDic); // create the command  
+
+        try
+        {
+            int numEffected = cmd.ExecuteNonQuery(); // execute the command  
+            return numEffected;
+        }
+        catch (Exception ex)
+        {
+            // write to log  
+            throw (ex);
+        }
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection  
+                con.Close();
+            }
+        }
+    }
+
 
     //--------------------------------------------------------------------
     // TODO Build the FLight Delete  method
