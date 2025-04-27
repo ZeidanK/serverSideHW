@@ -76,3 +76,6 @@ _ReSharper.Caches/
 
 # Microsoft package repository configuration file
 packages-microsoft-prod.deb
+
+# appsetting
+appsettings.json
