@@ -9,17 +9,19 @@ class User {
         this.active = active;
     }
 }
-const port = "";
-const address = "https://proj.ruppin.ac.il/cgroup4/test2/tar1";
+// const port = "";
+// const address = "https://proj.ruppin.ac.il/cgroup4/test2/tar1";
 
-// const port = "7062";
-// const address = "https://localhost:"
+const port = "7026";
+const address = "https://localhost:"
 
 /**
  * User authentication and session management
  */
 const UserManager = {
     ajaxCall: function(method, api, data, successCB, errorCB) {
+        const jwtToken = localStorage.getItem('jwtToken');
+
         $.ajax({
             type: method,
             url: `${address}${port}${api}`,
@@ -27,6 +29,7 @@ const UserManager = {
             cache: false,
             contentType: "application/json",
             dataType: "json",
+            headers: jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {},
             success: successCB,
             error: errorCB
         });

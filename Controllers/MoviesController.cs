@@ -33,7 +33,7 @@ namespace ServerSide_HW.Controllers
             return Ok(Movie.Read(userId.Value));
         }
 
-     
+        
 
         [HttpGet("byTitle/{title}")]
         public ActionResult<IEnumerable<Movie>> GetByTitle(string title)
@@ -76,6 +76,14 @@ namespace ServerSide_HW.Controllers
             }
         }
 
+        [HttpPost("addNewMovie")]
+        public ActionResult<int> PostDB([FromBody] Movie movie)
+        {
+            DBservices dBservices = new DBservices();
+            return(dBservices.Insert(movie));
+            
+        }
+
         [HttpDelete("{id}")]
         public ActionResult<bool> Delete(int id)
         {
@@ -84,6 +92,32 @@ namespace ServerSide_HW.Controllers
                 return Unauthorized("User ID not found in token");
 
             return Ok(Movie.DeleteMovie(userId.Value, id));
+        }
+        [HttpGet("search")]
+        public ActionResult SearchMovies(string? searchTerm, DateTime? releaseDateFrom, DateTime? releaseDateTo, int pageNumber, int pageSize)
+        {
+            try
+            {
+                DBservices dbServices = new DBservices();
+                var result = dbServices.SearchMovies(searchTerm, releaseDateFrom, releaseDateTo, pageNumber, pageSize);
+
+                if ( result.Item1 == null || result.Item1.Count == 0)
+                {
+                    return NotFound("No movies found matching the search criteria.");
+                }
+
+                var response = new
+                {
+                    Movies = result.Item1,
+                    TotalCount = result.Item2
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

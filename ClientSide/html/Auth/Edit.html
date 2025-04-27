@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Edit My Profile</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../CSS/Styles.css">
+    <link rel="stylesheet" href="../../CSS/Auth.css">
+
+    <!-- SCRIPTS -->
+    <script src="../../JS/layout/Header.js"></script>
+    <script src="../../JS/Models/User.js"></script>
+</head>
+<body>
+
+    <!-- Header placeholder -->
+    <header></header>
+
+    <div class="auth-container">
+        <h1 class="auth-title">Edit My Profile</h1>
+        <form id="editProfileForm" class="auth-form">
+            <div class="auth-form-group">
+                <label for="username" class="auth-label">Username:</label>
+                <input type="text" id="username" name="username" class="auth-input" required>
+            </div>
+            <div class="auth-form-group">
+                <label for="email" class="auth-label">Email:</label>
+                <input type="email" id="email" name="email" class="auth-input" required>
+            </div>
+            <div class="auth-form-group">
+                <label for="password" class="auth-label">Password:</label>
+                <input type="password" id="password" name="password" class="auth-input" required>
+            </div>
+            <button type="submit" class="auth-btn">Update Profile</button>
+        </form>
+        <!-- Added Test Claims button -->
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="testClaimsBtn" class="modern-button">Test Claims</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const userToken = localStorage.getItem('jwtToken');
+            if (!userToken) {
+                // Not logged in? Redirect to login page.
+                window.location.href = 'Login.html';
+                return;
+            }
+
+            
+
+            $('#editProfileForm').on('submit', function (event) {
+                event.preventDefault();
+
+                const updatedUser = {
+                    name: $('#username').val(),
+                    email: $('#email').val(),
+                    password: $('#password').val()
+                };
+
+                UserManager.ajaxCall(
+                    'PUT',
+                    '/api/Users/UpdateProfile',
+                    JSON.stringify(updatedUser),
+                    function (response) {
+                        alert('Profile updated successfully!');
+                        window.location.href = '../index.html'; // Redirect after update
+                    },
+                    function (error) {
+                        console.error('Update zzzz failed:', error);
+                        alert(error.responseJSON?.message || 'Update failed. Please try again.');
+                    }
+                );
+            });
+            // Bind click event to the Test Claims button
+            $('#testClaimsBtn').on('click', function() {
+                // Debugging: Log token details
+                console.log("Token being sent:", userToken);
+                console.log("Token length:", userToken.length);
+
+                // Verify token exists before making the request
+                if (!userToken) {
+                    console.error("No token found. Cannot proceed with the request.");
+                    alert("Authorization token is missing. Please log in again.");
+                    return;
+                }
+
+                UserManager.ajaxCall(
+                    'GET',
+                    '/api/Users/debug-token',
+                    null,
+                    function(response) {
+                        console.log("Success:", response);
+                        alert("Token debug successful. Check console for details.");
+                    },
+                    function(error) {
+                        console.error("Error details:", error);
+                        alert(error.responseJSON?.message || "Token debug failed. Check console for details.");
+                    }
+                   
+                );
+            });
+
+        });
+    </script>
+
+</body>
+</html>
