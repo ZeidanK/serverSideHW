@@ -175,49 +175,129 @@ namespace ServerSide_HW.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        //[HttpPut("UpdateProfile")]
+        //[Authorize]
         [HttpPut("UpdateProfile")]
         [Authorize]
-        public IActionResult UpdateProfile([FromBody] User updatedUser)
+        public IActionResult UpdateProfile([FromBody] User[] request)
         {
-            if (updatedUser == null)
+            if (request == null || request[0] == null || string.IsNullOrEmpty(request[1].Password))
             {
                 return BadRequest("Invalid user data.");
             }
 
-            // Extract email from JWT token
-            string emailFromToken = GetEmailFromToken();
-           var userID = GetUserIdFromToken();
-            //if (string.IsNullOrEmpty(emailFromToken))
-            //{
-            //    return Unauthorized("Invalid token.");
-            //}
+            // Extract user ID from JWT token
+            var userID = GetUserIdFromToken();
+            if (userID == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
 
             DBservices dBservices = new DBservices();
-            var existingUser = dBservices.GetUser(null,userID,null);
+            var existingUser = dBservices.GetUser(null, userID, null);
 
             if (existingUser == null)
             {
                 return NotFound("User not found.");
             }
 
-            //var Token = GenerateJwtToken(existingUser);
-
-            // Update user details
-            existingUser.Name = updatedUser.Name ?? existingUser.Name;
-            if (!string.IsNullOrEmpty(updatedUser.Password))
+            // Verify the provided password matches the current user's password
+            var hashedPassword = Models.User.HashPassword(request[1].Password);
+            if (existingUser.Password != hashedPassword)
             {
-                existingUser.Password = Models.User.HashPassword(updatedUser.Password);
+                return Unauthorized("Incorrect password.");
             }
-            var Token = GenerateJwtToken(existingUser);
+
+            // Update user details based on provided values
+            if (request[0].Name != "-1")
+            {
+                existingUser.Name = request[0].Name;
+            }
+            if (request[0].Email != "-1")
+            {
+                existingUser.Email = request[0].Email;
+            }
+            if (request[0].Password != "-1")
+            {
+                existingUser.Password = Models.User.HashPassword(request[0].Password);
+            }
+
+            // Save the updated user to the database
             int result = dBservices.UpdateUser(existingUser);
 
             if (result > 0)
             {
-                return Ok(new { message = "Profile updated successfully." });
+                // Generate a new JWT token for the updated user
+                var newToken = GenerateJwtToken(existingUser);
+
+                return Ok(new
+                {
+                    message = "Profile updated successfully.",
+                    Token = newToken
+                });
             }
 
             return StatusCode(500, "An error occurred while updating the profile.");
         }
+
+        // Define a request model to encapsulate both the updated user and the password
+        //public class UpdateProfileRequest
+        //{
+        //    public User UpdatedUser { get; set; }
+        //    public string Password { get; set; }
+        //}
+        //{
+        //    if (updatedUser == null)
+        //    {
+        //        return BadRequest("Invalid user data.");
+        //    }
+
+        //    // Extract user ID from JWT token
+        //    var userID = GetUserIdFromToken();
+        //    if (userID == null)
+        //    {
+        //        return Unauthorized("Invalid token.");
+        //    }
+
+        //    DBservices dBservices = new DBservices();
+        //    var existingUser = dBservices.GetUser(null, userID, null);
+
+        //    if (existingUser == null)
+        //    {
+        //        return NotFound("User not found.");
+        //    }
+
+        //    // Verify the provided password matches the current user's password
+        //    var hashedPassword = Models.User.HashPassword(password);
+        //    if (existingUser.Password != hashedPassword)
+        //    {
+        //        return Unauthorized("Incorrect password.");
+        //    }
+
+        //    // Update user details based on provided values
+        //    if (updatedUser.Name != "-1")
+        //    {
+        //        existingUser.Name = updatedUser.Name;
+        //    }
+        //    if (updatedUser.Email != "-1")
+        //    {
+        //        existingUser.Email = updatedUser.Email;
+        //    }
+        //    if (updatedUser.Password != "-1")
+        //    {
+        //        existingUser.Password = Models.User.HashPassword(updatedUser.Password);
+        //    }
+
+        //    // Save the updated user to the database
+        //    int result = dBservices.UpdateUser(existingUser);
+
+        //    if (result > 0)
+        //    {
+        //        return Ok(new { message = "Profile updated successfully." });
+        //    }
+
+        //    return StatusCode(500, "An error occurred while updating the profile.");
+        //}
 
 
 

@@ -68,7 +68,10 @@
                         console.log(response);
                         if (response.Token) {
                             localStorage.setItem('jwtToken', response.Token);
-                            window.location.href = '../index.html'; // Redirect after login
+
+                            setTimeout(function () {
+                                window.location.href = '../index.html'; // Redirect after login
+                            }, 2000); // 2-second delay
                         } else {
                             alert('Invalid token received');
                         }

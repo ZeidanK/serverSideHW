@@ -39,75 +39,149 @@
             </div>
             <button type="submit" class="auth-btn">Update Profile</button>
         </form>
-        <!-- Added Test Claims button -->
+
+        <!-- Buttons for additional forms -->
         <div style="text-align: center; margin-top: 20px;">
-            <button id="testClaimsBtn" class="modern-button">Test Claims</button>
+            <button id="changePasswordBtn" class="modern-button">Change Password</button>
+            <button id="changeEmailBtn" class="modern-button">Change Email</button>
+            <button id="changeUsernameBtn" class="modern-button">Change Username</button>
         </div>
+
+        <!-- Forms for additional actions -->
+        <form id="changePasswordForm" class="auth-form" style="display: none; margin-top: 20px;">
+            <h2>Change Password</h2>
+            <div class="auth-form-group">
+                <label for="currentPassword" class="auth-label">Current Password:</label>
+                <input type="password" id="currentPassword" name="currentPassword" class="auth-input" required>
+            </div>
+            <div class="auth-form-group">
+                <label for="newPassword" class="auth-label">New Password:</label>
+                <input type="password" id="newPassword" name="newPassword" class="auth-input" required>
+            </div>
+            <div class="auth-form-group">
+                <label for="confirmNewPassword" class="auth-label">Confirm New Password:</label>
+                <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="auth-input" required>
+            </div>
+            <button type="submit" class="auth-btn">Update Password</button>
+        </form>
+
+        <form id="changeEmailForm" class="auth-form" style="display: none; margin-top: 20px;">
+            <h2>Change Email</h2>
+            <div class="auth-form-group">
+                <label for="currentPasswordEmail" class="auth-label">Current Password:</label>
+                <input type="password" id="currentPasswordEmail" name="currentPasswordEmail" class="auth-input" required>
+            </div>
+            <div class="auth-form-group">
+                <label for="newEmail" class="auth-label">New Email:</label>
+                <input type="email" id="newEmail" name="newEmail" class="auth-input" required>
+            </div>
+            <button type="submit" class="auth-btn">Update Email</button>
+        </form>
+
+        <form id="changeUsernameForm" class="auth-form" style="display: none; margin-top: 20px;">
+            <h2>Change Username</h2>
+            <div class="auth-form-group">
+                <label for="currentPasswordUsername" class="auth-label">Current Password:</label>
+                <input type="password" id="currentPasswordUsername" name="currentPasswordUsername" class="auth-input" required>
+            </div>
+            <div class="auth-form-group">
+                <label for="newUsername" class="auth-label">New Username:</label>
+                <input type="text" id="newUsername" name="newUsername" class="auth-input" required>
+            </div>
+            <button type="submit" class="auth-btn">Update Username</button>
+        </form>
     </div>
 
     <script>
         $(document).ready(function () {
             const userToken = localStorage.getItem('jwtToken');
             if (!userToken) {
-                // Not logged in? Redirect to login page.
                 window.location.href = 'Login.html';
                 return;
             }
 
-            
-
-            $('#editProfileForm').on('submit', function (event) {
-                event.preventDefault();
-
-                const updatedUser = {
-                    name: $('#username').val(),
-                    email: $('#email').val(),
-                    password: $('#password').val()
-                };
-
-                UserManager.ajaxCall(
-                    'PUT',
-                    '/api/Users/UpdateProfile',
-                    JSON.stringify(updatedUser),
-                    function (response) {
-                        alert('Profile updated successfully!');
-                        window.location.href = '../index.html'; // Redirect after update
-                    },
-                    function (error) {
-                        console.error('Update zzzz failed:', error);
-                        alert(error.responseJSON?.message || 'Update failed. Please try again.');
-                    }
-                );
+            // Show/hide forms based on button clicks
+            $('#changePasswordBtn').on('click', function () {
+                $('.auth-form').hide();
+                $('#changePasswordForm').show();
             });
-            // Bind click event to the Test Claims button
-            $('#testClaimsBtn').on('click', function() {
-                // Debugging: Log token details
-                console.log("Token being sent:", userToken);
-                console.log("Token length:", userToken.length);
 
-                // Verify token exists before making the request
-                if (!userToken) {
-                    console.error("No token found. Cannot proceed with the request.");
-                    alert("Authorization token is missing. Please log in again.");
+            $('#changeEmailBtn').on('click', function () {
+                $('.auth-form').hide();
+                $('#changeEmailForm').show();
+            });
+
+            $('#changeUsernameBtn').on('click', function () {
+                $('.auth-form').hide();
+                $('#changeUsernameForm').show();
+            });
+
+            // Handle form submissions
+            $('#changePasswordForm').on('submit', function (event) {
+                event.preventDefault();
+                const currentPassword = $('#currentPassword').val();
+                const newPassword = $('#newPassword').val();
+                const confirmNewPassword = $('#confirmNewPassword').val();
+
+                if (newPassword !== confirmNewPassword) {
+                    alert('New passwords do not match.');
                     return;
                 }
 
+                const data = { currentPassword, newPassword };
                 UserManager.ajaxCall(
-                    'GET',
-                    '/api/Users/debug-token',
-                    null,
-                    function(response) {
-                        console.log("Success:", response);
-                        alert("Token debug successful. Check console for details.");
+                    'PUT',
+                    '/api/Users/ChangePassword',
+                    JSON.stringify(data),
+                    function () {
+                        alert('Password updated successfully!');
+                        location.reload();
                     },
-                    function(error) {
-                        console.error("Error details:", error);
-                        alert(error.responseJSON?.message || "Token debug failed. Check console for details.");
+                    function (error) {
+                        alert(error.responseJSON?.message || 'Failed to update password.');
                     }
-                   
                 );
             });
 
+            $('#changeEmailForm').on('submit', function (event) {
+                event.preventDefault();
+                const currentPassword = $('#currentPasswordEmail').val();
+                const newEmail = $('#newEmail').val();
+
+                const data = { currentPassword, newEmail };
+                UserManager.ajaxCall(
+                    'PUT',
+                    '/api/Users/ChangeEmail',
+                    JSON.stringify(data),
+                    function () {
+                        alert('Email updated successfully!');
+                        location.reload();
+                    },
+                    function (error) {
+                        alert(error.responseJSON?.message || 'Failed to update email.');
+                    }
+                );
+            });
+
+            $('#changeUsernameForm').on('submit', function (event) {
+                event.preventDefault();
+                const currentPassword = $('#currentPasswordUsername').val();
+                const newUsername = $('#newUsername').val();
+
+                const data = { currentPassword, newUsername };
+                UserManager.ajaxCall(
+                    'PUT',
+                    '/api/Users/ChangeUsername',
+                    JSON.stringify(data),
+                    function () {
+                        alert('Username updated successfully!');
+                        location.reload();
+                    },
+                    function (error) {
+                        alert(error.responseJSON?.message || 'Failed to update username.');
+                    }
+                );
+            });
         });
     </script>
 
