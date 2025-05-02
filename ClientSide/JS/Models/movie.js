@@ -1,3 +1,6 @@
+// import notify from ../layout/notiry.min.js
+
+
 // Define a Movie class
 class Movie {
     constructor(id, title, description, image, year, releaseDate, language, budget, grossWorldwide, genres, isAdult, runtimeMinutes, averageRating, numVotes) {
@@ -94,7 +97,7 @@ const MovieUtils = {
     },
 
     createAddButton: function(movieInstance, index) {
-        const addBtn = $('<button>').addClass('add-movie-btn').text('Add Movie').css({
+        const addBtn = $('<button>').addClass('add-movie-btn').text('Add To Cart').css({
             backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 15px',
             marginTop: '10px', cursor: 'pointer', borderRadius: '4px'
         });
@@ -138,17 +141,23 @@ const MovieUtils = {
     },
 
     createDeleteButton: function(movieInstance) {
-        const deleteBtn = $('<button>').addClass('delete-movie-btn').text('Delete Movie').css({
+        const deleteBtn = $('<button>').addClass('delete-movie-btn').text('remove from cart').css({
             backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 15px',
             marginTop: '10px', cursor: 'pointer', borderRadius: '4px'
         });
 
         deleteBtn.on('click', function() {
-            if (confirm("Are you sure you want to delete this movie?")) {
-                MovieUtils.ajaxCall("DELETE", `/api/movies/${movieInstance.id}`, null,
-                    () => { alert("Success! Movie deleted."); MovieUtils.initMyMoviesPage(); },
-                    MovieUtils.showErrorMessage
-                );
+            if (confirm("Are you sure you want to removie this movie?")) {
+            MovieUtils.ajaxCall("DELETE", `/api/movies/${movieInstance.id}`, null,
+                () => {
+                $.notify("Success! Movie removed from the cart.", "success");
+                localStorage.setItem('CartCount', parseInt(localStorage.getItem('CartCount')) - 1);
+                MovieUtils.initMyMoviesPage();
+                },
+                MovieUtils.showErrorMessage
+            );
+            } else {
+            $.notify("Movie deletion canceled.", "info");
             }
         });
 
@@ -156,15 +165,12 @@ const MovieUtils = {
     },
 
     showSuccessMessage: function(data, buttonElement) {
-        const box = $('<div>').addClass('message-box').css({
-            padding: '10px', margin: '10px 0', borderRadius: '4px', fontSize: '14px',
-            color: data === false ? '#856404' : '#155724',
-            backgroundColor: data === false ? '#fff3cd' : '#d4edda',
-            border: data === false ? '1px solid #ffeeba' : '1px solid #c3e6cb'
-        }).text(data === false ? "The movie was not added." : "Success! Movie added.");
-
-        $(buttonElement).after(box);
-        setTimeout(() => box.fadeOut(500, () => box.remove()), 3000);
+        if (data === false) {
+            $.notify("The movie is already in the cart.", "warning");
+        } else {
+            $.notify("Success! Movie added to the cart.", "success");
+            localStorage.setItem('CartCount', parseInt(localStorage.getItem('CartCount')) + 1);
+        }
     },
 
     showErrorMessage: function(xhr) {
@@ -194,8 +200,10 @@ const MovieUtils = {
 
     displayMovies: function(movies, container, isMyMovies = false) {
         container.empty();
+        let CartCount =0;
         if (movies && movies.length > 0) {
             $.each(movies, function(index, movie) {
+                CartCount++;
                 const card = MovieUtils.createMovieCard(movie, index, isMyMovies);
                 container.append(card);
                 let moviesbtn=document.getElementById("loadMoviesBtn");
@@ -204,6 +212,7 @@ const MovieUtils = {
         } else {
             container.html('<div style="grid-column: 1/-1; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">No movie data available.</div>');
         }
+        localStorage.setItem('CartCount', CartCount);
     },
 
     loadServerMovies: function() {
@@ -252,7 +261,7 @@ function onGetSuccess(data) {
 
 // Success callback for DELETE request
 function onDeleteSuccess(data) {
-    alert("Success! Movie deleted.");
+    $.notiry("Success! Movie removed from cart.");
     // Reload the movies to refresh the list
     loadMovies();
 }
