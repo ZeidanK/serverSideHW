@@ -186,3 +186,42 @@ h1 {
     text-decoration: underline;
     color: #005f8a;
 }
+
+
+
+
+
+.modern-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.modern-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.modern-button:hover {
+    background-color: #0056b3;
+}
+
+.modern-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination {
+    margin: 20px 0;
+    text-align: center;
+}
