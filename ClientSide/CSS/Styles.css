@@ -21,6 +21,58 @@ header {
     align-items: center;
     
 }
+.user-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.user-profile-img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 8px;
+    object-fit: cover;
+}
+
+.user-name {
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+.dropdown-arrow {
+    font-size: 12px;
+    color:#d8c2c2;
+    margin-left: 4px;
+}
+
+.dropdown-menu a {
+    color: #333;
+    text-decoration:none;
+    background-color: #91acf7;
+    padding: 0px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin : 1px;
+    text-align: center;
+}
+
+.dropdown-menu a:hover {
+    /* text-decoration: underline; */
+    color: #007bff;
+    border:#8db1bd;
+    border-radius: 5px;
+    background-color:#8db1bd;
+    margin : 3px;
+}
+
+.user-dropdown {
+    cursor: pointer;
+    border-radius: 20px;
+    padding: 10px 20px;
+}
 
 .nav-buttons {
     display: flex;
@@ -53,7 +105,8 @@ header {
 }
 
 .active {
-    background-color: #4c9daf;
+    background-color: #3a6c77;
+    border: 4px solid #c6cf28;
 }
 .nav-buttons-right {
     align-items: center;
