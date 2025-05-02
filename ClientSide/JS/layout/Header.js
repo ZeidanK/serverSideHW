@@ -165,6 +165,7 @@ const HeaderComponent = {
                 logoutOption.onclick = function (e) {
                     e.preventDefault();
                     localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('CartCount');
                     location.href = paths.indexPath;
                 };
                 dropdownMenu.appendChild(logoutOption);
