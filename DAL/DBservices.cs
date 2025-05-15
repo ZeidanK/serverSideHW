@@ -203,29 +203,29 @@ public class DBservices
     //---------------------------------------------------------------------------------
     // Create the SqlCommand
     //---------------------------------------------------------------------------------
-    private SqlCommand CreateCommandWithStoredProcedureGeneral(String spName, SqlConnection con, Dictionary<string, object> paramDic)
-    {
+    // private SqlCommand CreateCommandWithStoredProcedureGeneral(String spName, SqlConnection con, Dictionary<string, object> paramDic)
+    // {
 
-        SqlCommand cmd = new SqlCommand(); // create the command object
+    //     SqlCommand cmd = new SqlCommand(); // create the command object
 
-        cmd.Connection = con;              // assign the connection to the command object
+    //     cmd.Connection = con;              // assign the connection to the command object
 
-        cmd.CommandText = spName;      // can be Select, Insert, Update, Delete 
+    //     cmd.CommandText = spName;      // can be Select, Insert, Update, Delete 
 
-        cmd.CommandTimeout = 10;           // Time to wait for the execution' The default is 30 seconds
+    //     cmd.CommandTimeout = 10;           // Time to wait for the execution' The default is 30 seconds
 
-        cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
+    //     cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
 
-        if (paramDic != null)
-            foreach (KeyValuePair<string, object> param in paramDic)
-            {
-                cmd.Parameters.AddWithValue(param.Key, param.Value);
+    //     if (paramDic != null)
+    //         foreach (KeyValuePair<string, object> param in paramDic)
+    //         {
+    //             cmd.Parameters.AddWithValue(param.Key, param.Value);
 
-            }
+    //         }
 
 
-        return cmd;
-    }
+    //     return cmd;
+    // }
     //--------------------------------------------------------------------------------------------------
     // This method searches for movies with filters and pagination
     //--------------------------------------------------------------------------------------------------
@@ -436,5 +436,215 @@ public class DBservices
     // TODO Build the FLight Delete  method
     // DeleteFlight(int id)
     //--------------------------------------------------------------------
+
+
+
+
+    
+    //--------------------------------------------------------------------------------------------------
+    // This method update a student to the student table 
+    //--------------------------------------------------------------------------------------------------
+    public int Update(Student student)
+    {
+
+        SqlConnection con;
+        SqlCommand cmd;
+
+        try
+        {
+            con = connect("myProjDB"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        cmd = CreateCommandWithStoredProcedure("spUpdateStudent1", con,student);             // create the command
+
+        try
+        {
+            int numEffected = cmd.ExecuteNonQuery(); // execute the command
+            return numEffected;
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+
+    }
+
+
+
+    //---------------------------------------------------------------------------------
+    // Create the SqlCommand using a stored procedure
+    //---------------------------------------------------------------------------------
+    private SqlCommand CreateCommandWithStoredProcedure(String spName, SqlConnection con, Student student)
+    {
+
+        SqlCommand cmd = new SqlCommand(); // create the command object
+
+        cmd.Connection = con;              // assign the connection to the command object
+
+        cmd.CommandText = spName;      // can be Select, Insert, Update, Delete 
+
+        cmd.CommandTimeout = 10;           // Time to wait for the execution' The default is 30 seconds
+
+        cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
+
+        cmd.Parameters.AddWithValue("@id", student.Id);
+
+        cmd.Parameters.AddWithValue("@name", student.Name);
+
+        cmd.Parameters.AddWithValue("@age", student.Age);
+
+
+        return cmd;
+    }
+
+    //--------------------------------------------------------------------------------------------------
+    // This method inserts a car to the students table 
+    //--------------------------------------------------------------------------------------------------
+    public int Insert(Student student)
+    {
+
+        SqlConnection con;
+        SqlCommand cmd;
+
+        try
+        {
+            con = connect("myProjDB"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@Name", student.Name);
+        paramDic.Add("@Age", student.Age);
+
+        cmd = CreateCommandWithStoredProcedureGeneral("SP_InsertStudent25", con, paramDic);          // create the command
+
+        try
+        {
+            int numEffected = cmd.ExecuteNonQuery(); // execute the command
+            return numEffected;
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+
+    }
+
+
+
+    //--------------------------------------------------------------------------------------------------
+    // This method inserts a car to the students table 
+    //--------------------------------------------------------------------------------------------------
+    public List<Student> Read()
+    {
+
+        SqlConnection con;
+        SqlCommand cmd;
+
+        try
+        {
+            con = connect("myProjDB"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        cmd = CreateCommandWithStoredProcedureGeneral("SP_ReadStudent_25", con, null);
+        //create the command
+
+        List<Student> students = new List<Student>();
+
+        SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+        try
+        {
+
+            while (dataReader.Read())
+            {
+                Student s = new Student();
+                s.Id = Convert.ToInt32(dataReader["Id"]);
+                s.Name = dataReader["Name"].ToString();
+                s.Age = Convert.ToDouble(dataReader["Age"]);
+                students.Add(s);
+            }
+            return students;
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+
+    }
+
+ 
+
+    //---------------------------------------------------------------------------------
+    // Create the SqlCommand
+    //---------------------------------------------------------------------------------
+    private SqlCommand CreateCommandWithStoredProcedureGeneral(String spName, SqlConnection con, Dictionary<string, object> paramDic)
+    {
+
+        SqlCommand cmd = new SqlCommand(); // create the command object
+
+        cmd.Connection = con;              // assign the connection to the command object
+
+        cmd.CommandText = spName;      // can be Select, Insert, Update, Delete 
+
+        cmd.CommandTimeout = 10;           // Time to wait for the execution' The default is 30 seconds
+
+        cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
+
+        if (paramDic != null)
+            foreach (KeyValuePair<string, object> param in paramDic)
+            {
+                cmd.Parameters.AddWithValue(param.Key, param.Value);
+
+            }
+
+
+        return cmd;
+    }
 
 }
