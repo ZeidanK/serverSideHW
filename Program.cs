@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -85,8 +85,11 @@ app.UseHttpsRedirection();
 // Replace your current CORS configuration with this:
 app.UseCors(policy => policy
     .SetIsOriginAllowed(origin => true) // Allow any origin dynamically
+
+
     //.WithOrigins("http://127.0.0.1:3000", "http://localhost:3000") // Add your frontend origins
     //.AllowAnyOrigin()
+
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()); // This is critical for Authorization headers

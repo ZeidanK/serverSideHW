@@ -22,9 +22,9 @@ namespace ServerSide_HW.Controllers
         [HttpGet]
         public IEnumerable<User> Get()
         {
-
-            List<User> users = Models.User.Read();
-            return users;
+            DBservices dBservices = new DBservices();
+            var results = dBservices.GetAllUsers();
+            return results.Item1;
         }
 
         //// GET api/<UsersController>/5
@@ -45,8 +45,8 @@ namespace ServerSide_HW.Controllers
             else
             {
                 DBservices dBservices = new DBservices();
-                int res =dBservices.Insert(user);
-                return res>0;
+                int res = dBservices.Insert(user);
+                return res > 0;
             }
         }
 
@@ -108,7 +108,7 @@ namespace ServerSide_HW.Controllers
         [HttpPost("LoginJWT")]
         public IActionResult LoginJWT([FromBody] User user)
         {
-            if (user == null || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password))
+            if (user == null || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password)|| user.Active!= true)
             {
                 return BadRequest("Invalid user data.");
             }
@@ -126,6 +126,10 @@ namespace ServerSide_HW.Controllers
             if (existingUser == null)
             {
                 return Unauthorized("User not found.");
+            }
+            if(existingUser.Active == false)
+            {
+                return Unauthorized("User is not active.");
             }
 
             // Hash the provided password and compare with the stored password  
@@ -174,6 +178,19 @@ namespace ServerSide_HW.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        [HttpPut("UpdateUserStatus")]
+        public int UpdateUserStatus(User user)
+        {
+            DBservices dBservices = new DBservices();
+            if (user.Active)
+            {
+                user.Active = false;
+            }
+            else user.Active = true;
+                int result = dBservices.UpdateUser(user);
+            return result;
         }
         //[HttpPut("UpdateProfile")]
         //[Authorize]
