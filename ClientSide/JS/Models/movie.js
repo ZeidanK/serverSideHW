@@ -3,7 +3,7 @@
 
 // Define a Movie class
 class Movie {
-    constructor(id, title, description, image, year, releaseDate, language, budget, grossWorldwide, genres, isAdult, runtimeMinutes, averageRating, numVotes) {
+    constructor(id, title, description, image, year, releaseDate, language, budget, grossWorldwide, genres, isAdult, runtimeMinutes, averageRating, numVotes, priceToRent, rentalCount, rentEndDate, rentStartDate) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -18,6 +18,10 @@ class Movie {
         this.runtimeMinutes = runtimeMinutes;
         this.averageRating = averageRating;
         this.numVotes = numVotes;
+        this.priceToRent = priceToRent;
+        this.rentalCount = rentalCount;
+        this.rentEndDate = null;
+        this.rentStartDate = null;
     }
 }
 
@@ -77,12 +81,18 @@ const MovieUtils = {
         return Number(num || 0).toLocaleString();
     },
 
-    createCardContent: function(movieInstance) {
+    createCardContent: function(movieInstance,cart=false) {
         const content = $('<div>').addClass('movie-content');
         content.append($('<div>').addClass('movie-title').text(movieInstance.title));
         content.append($('<div>').addClass('movie-info').html('<strong>Year:</strong> ' + (movieInstance.year || 'N/A')));
         content.append($('<div>').addClass('movie-info').html('<strong>Description:</strong> ' + this.truncateDescription(movieInstance.description)));
         content.append($('<div>').addClass('movie-rating').html('<strong>Rating:</strong> ' + movieInstance.averageRating));
+        if(cart){
+            content.append($('<div>').addClass('movie-info').html('<strong>Rental Count:</strong> ' + this.formatNumber(movieInstance.rentalCount)));
+           // content.append($('<div>').addClass('movie-info').html('<strong>Rental Start Date:</strong> ' + this.formatDate(movieInstance.rentStartDate)));
+           // content.append($('<div>').addClass('movie-info').html('<strong>Rental End Date:</strong> ' + this.formatDate(movieInstance.rentEndDate)));
+            content.append($('<div>').addClass('movie-info').html('<strong>Price To Rent:</strong> $' + this.formatNumber(movieInstance.priceToRent)));
+        }
         const genresContainer = $('<div>').addClass('movie-info genres-container');
         genresContainer.append($('<strong>').text('Genres: '));
         genresContainer.append($(this.formatGenres(movieInstance.genres)));
@@ -91,7 +101,12 @@ const MovieUtils = {
             '<strong>Budget:</strong> $' + this.formatNumber(movieInstance.budget) +
             ' | <strong>Box Office:</strong> $' + this.formatNumber(movieInstance.grossWorldwide) +
             ' | <strong>Votes:</strong> ' + this.formatNumber(movieInstance.numVotes)
+            
         );
+        if (cart) {
+            footer.append(this.createDeleteButton(movieInstance));
+
+        }
         content.append(footer);
         return content;
     },
@@ -111,10 +126,10 @@ const MovieUtils = {
                 localStorage.removeItem('jwtToken');
                 return window.location.href = "Auth/Login.html";
             }
-
+            console.log(movieInstance);
             const genresValue = Array.isArray(movieInstance.genres) ? movieInstance.genres.join(', ') : (movieInstance.genres || "string");
             const movieToAdd = {
-                id: index + 1,
+                id: movieInstance.id,
                 url: "string",
                 primaryTitle: movieInstance.title,
                 description: movieInstance.description || "string",
@@ -128,7 +143,9 @@ const MovieUtils = {
                 isAdult: movieInstance.isAdult || false,
                 runtimeMinutes: movieInstance.runtimeMinutes || 0,
                 averageRating: movieInstance.averageRating || 0,
-                numVotes: movieInstance.numVotes || 0
+                numVotes: movieInstance.numVotes || 0,
+                priceToRent: movieInstance.priceToRent || 0,
+                rentalCount: movieInstance.rentalCount || 0,
             };
 
             MovieUtils.ajaxCall("POST", "/api/movies", JSON.stringify(movieToAdd),
@@ -138,9 +155,100 @@ const MovieUtils = {
         });
 
         return addBtn;
-    },
-
-    createDeleteButton: function(movieInstance) {
+        },
+        createRentButton: function(movieInstance) {
+        // Create the Rent Movie button
+        const rentBtn = $('<button>')
+          .addClass('rent-movie-btn')
+          .text('Rent Movie')
+          .css({
+              backgroundColor: '#28a745',
+              color: 'white',
+              border: 'none',
+              padding: '8px 15px',
+              marginTop: '10px',
+              cursor: 'pointer',
+              borderRadius: '4px'
+          });
+          
+        rentBtn.on('click', function() {
+            // Check if a modal is already present, else create one
+            let rentFormModal = $('#rentFormModal');
+            if (!rentFormModal.length) {
+            rentFormModal = $(`
+                <div id="rentFormModal" class="modal-overlay" style="position: fixed; top: 0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;">
+                <div class="modal-content" style="background: white; padding: 20px; border-radius: 5px; width: 300px; text-align: center;">
+                    <h3>Rent Movie: ${movieInstance.title}</h3>
+                    <label for="startDate">Start Date:</label>
+                    <input id="startDate" type="date" style="width: 90%; padding: 5px; margin: 10px 0;"/>
+                    <label for="endDate">End Date:</label>
+                    <input id="endDate" type="date" style="width: 90%; padding: 5px; margin: 10px 0;"/>
+                    <p>Total Price: $<span id="rentPrice">0</span></p>
+                    <button id="confirmRent" style="margin-right:10px;">Rent Now</button>
+                    <button id="cancelRent">Cancel</button>
+                </div>
+                </div>
+            `);
+            $('body').append(rentFormModal);
+            }
+            
+            const dailyRate = movieInstance.priceToRent || 5;
+            const startDateInput = rentFormModal.find('#startDate');
+            const endDateInput = rentFormModal.find('#endDate');
+            const rentPriceSpan = rentFormModal.find('#rentPrice');
+            
+            function calculatePrice() {
+            const startDate = new Date(startDateInput.val());
+            const endDate = new Date(endDateInput.val());
+            if (startDate && endDate && endDate > startDate) {
+                const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                const totalPrice = dailyRate * days;
+                rentPriceSpan.text(totalPrice.toFixed(2));
+            } else {
+                rentPriceSpan.text('0');
+            }
+            }
+            
+            startDateInput.off('change').on('change', calculatePrice);
+            endDateInput.off('change').on('change', calculatePrice);
+            
+            rentFormModal.find('#cancelRent').off('click').on('click', function() {
+            rentFormModal.remove();
+            });
+            
+            rentFormModal.find('#confirmRent').off('click').on('click', function() {
+            const startDate = startDateInput.val();
+            const endDate = endDateInput.val();
+            if (!startDate || !endDate || new Date(endDate) <= new Date(startDate) || new Date(startDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)) {
+                $.notify("Please select valid start and end dates.", "warning");
+                return;
+            }
+            const days = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
+            const payload = {
+                movieId: movieInstance.id,
+                rentalDays: days,
+                startDate: new Date(startDate).toISOString(),
+                endDate: new Date(endDate).toISOString(),
+                totalPrice: dailyRate * days
+            };
+            console.log(payload);
+            MovieUtils.ajaxCall("POST", "/api/movies/rentMovie", JSON.stringify(payload),
+                function(resp) {
+                $.notify("Movie rented successfully!", "success");
+                rentFormModal.remove();
+                },
+                function(err) {
+                $.notify(err.responseJSON?.message || "Failed to rent movie", "error");
+                }
+            );
+            });
+            
+            rentFormModal.show();
+        });
+        
+        return rentBtn;
+        },
+        createDeleteButton: function(movieInstance) {
         const deleteBtn = $('<button>').addClass('delete-movie-btn').text('remove from cart').css({
             backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 15px',
             marginTop: '10px', cursor: 'pointer', borderRadius: '4px'
@@ -152,7 +260,7 @@ const MovieUtils = {
                 () => {
                 $.notify("Success! Movie removed from the cart.", "success");
                 localStorage.setItem('CartCount', parseInt(localStorage.getItem('CartCount')) - 1);
-                MovieUtils.initMyMoviesPage();
+                MovieUtils.initCartPage();
                 },
                 MovieUtils.showErrorMessage
             );
@@ -162,6 +270,74 @@ const MovieUtils = {
         });
 
         return deleteBtn;
+    },
+
+    createTransferButton: function(movieInstance) {
+        // Create the transfer button
+        const transferBtn = $('<button>')
+          .addClass('transfer-movie-btn')
+          .text('Transfer Rental')
+          .css({
+              backgroundColor: '#17a2b8',
+              color: 'white',
+              border: 'none',
+              padding: '8px 15px',
+              marginTop: '10px',
+              cursor: 'pointer',
+              borderRadius: '4px'
+          });
+    
+        transferBtn.on('click', function() {
+            // Create a modal for the transfer form
+            let transferModal = $('#transferModal');
+            if (!transferModal.length) {
+                transferModal = $(`
+                    <div id="transferModal" class="modal-overlay" style="position: fixed; top: 0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;">
+                        <div class="modal-content" style="background: white; padding: 20px; border-radius: 5px; width: 300px; text-align: center;">
+                            <h3>Transfer Rental: ${movieInstance.title}</h3>
+                            <label for="transferEmail">Recipient Email:</label>
+                            <input id="transferEmail" type="email" placeholder="user@example.com" style="width: 90%; padding: 5px; margin: 10px 0;"/>
+                            <div>
+                                <button id="confirmTransfer" style="margin-right:10px;">Transfer Now</button>
+                                <button id="cancelTransfer">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                $('body').append(transferModal);
+            }
+    
+            // Remove any previous event handlers on the modal buttons
+            transferModal.find('#cancelTransfer').off('click').on('click', function() {
+                transferModal.remove();
+            });
+            
+            transferModal.find('#confirmTransfer').off('click').on('click', function() {
+                const recipientEmail = transferModal.find('#transferEmail').val().trim();
+                if (!recipientEmail) {
+                    $.notify("Please enter a recipient email.", "warning");
+                    return;
+                }
+                // Build payload for the transfer API
+                const payload = {
+                    movieId: movieInstance.id,
+                    recipientEmail: recipientEmail
+                };
+                // Adjust the endpoint as needed
+                MovieUtils.ajaxCall("POST", "/api/movies/transfer", JSON.stringify(payload),
+                    function(resp) {
+                        $.notify("Rental transferred successfully!", "success");
+                        transferModal.remove();
+                    },
+                    function(err) {
+                        $.notify(err.responseJSON?.message || "Transfer failed.", "error");
+                    }
+                );
+            });
+            transferModal.show();
+        });
+    
+        return transferBtn;
     },
 
     showSuccessMessage: function(data, buttonElement) {
@@ -178,12 +354,35 @@ const MovieUtils = {
         container.html('<div style="grid-column: 1/-1; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">Error: ' + (xhr.responseJSON?.message || 'An error occurred.') + '</div>');
     },
 
+    createMovieCardCart: function(movie, index) {
+        console.log(movie);
+        const movieInstance = new Movie(
+            movie.id, movie.primaryTitle, movie.description, movie.primaryImage,
+            movie.year || movie.startYear, movie.releaseDate, movie.language,
+            movie.budget, movie.grossWorldwide, movie.genres,
+            movie.isAdult, movie.runtimeMinutes, movie.averageRating, movie.numVotes,
+            movie.priceToRent, movie.rentalCount, movie.rentEndDate, movie.rentStartDate
+        );
+
+        const card = $('<div>').addClass('movie-card');
+        if (movieInstance.image) {
+            const img = $('<img>').addClass('movie-img').attr('src', movieInstance.image).attr('alt', movieInstance.title);
+            card.append(img);
+        }
+
+        const content = this.createCardContent(movieInstance,true);
+        content.append(this.createRentButton(movieInstance));
+        card.append(content);
+        return card;
+    },
+    
     createMovieCard: function(movie, index, isMyMovies = false) {
         const movieInstance = new Movie(
             movie.id, movie.primaryTitle, movie.description, movie.primaryImage,
             movie.year || movie.startYear, movie.releaseDate, movie.language,
             movie.budget, movie.grossWorldwide, movie.genres,
-            movie.isAdult, movie.runtimeMinutes, movie.averageRating, movie.numVotes
+            movie.isAdult, movie.runtimeMinutes, movie.averageRating, movie.numVotes,
+            movie.priceToRent, movie.rentalCount, movie.rentEndDate, movie.rentStartDate
         );
 
         const card = $('<div>').addClass('movie-card');
@@ -193,9 +392,27 @@ const MovieUtils = {
         }
 
         const content = this.createCardContent(movieInstance);
-        isMyMovies ? content.append(this.createDeleteButton(movieInstance)) : content.append(this.createAddButton(movieInstance, index));
+        isMyMovies ? content.append(this.createTransferButton(movieInstance)) : content.append(this.createAddButton(movieInstance, index));
         card.append(content);
         return card;
+    },
+
+    displayMoviesCart: function(movies, container) {
+        console.log(movies);
+        container.empty();
+        let CartCount =0;
+        if (movies && movies.length > 0) {
+            $.each(movies, function(index, movie) {
+                CartCount++;
+                const card = MovieUtils.createMovieCardCart(movie, index);
+                container.append(card);
+                let moviesbtn=document.getElementById("loadMoviesBtn");
+                moviesbtn.style.display='none';
+            });
+        } else {
+            container.html('<div style="grid-column: 1/-1; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">No movie data available.</div>');
+        }
+        localStorage.setItem('CartCount', CartCount);
     },
 
     displayMovies: function(movies, container, isMyMovies = false) {
@@ -246,6 +463,16 @@ const MovieUtils = {
 
         MovieUtils.ajaxCall("GET", "/api/movies", null,
             data => MovieUtils.displayMovies(data, container, true),
+            MovieUtils.showErrorMessage
+        );
+    },
+
+    initCartPage: function () {
+        const container = $('#movies-container');
+        container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Loading your cart...</div>');
+
+        MovieUtils.ajaxCall("GET", "/api/movies", null,
+            data => MovieUtils.displayMoviesCart(data, container, true),
             MovieUtils.showErrorMessage
         );
     }

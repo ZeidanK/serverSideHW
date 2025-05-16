@@ -36,10 +36,81 @@ public class DBservices
         con.Open();
         return con;
     }
+
+    //--------------------------------------------------------------------------------------------------
+    // This method returns all the users rented movies
+    //--------------------------------------------------------------------------------------------------
+    public List<Movie> GetRentedMovies(int userId)
+    {
+        SqlConnection con;
+        SqlCommand cmd;
+        SqlDataReader reader = null;
+        List<Movie> movies = new List<Movie>();
+        try
+        {
+            con = connect("myProjDB"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@userId", userId);
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_GetUserRentedMovies2025", con, paramDic);         // create the command
+        try
+        {
+            reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                Movie movie = new Movie
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    PrimaryTitle = reader["primaryTitle"].ToString(),
+                    Description = reader["description"].ToString(),
+                    PrimaryImage = reader["primaryImage"].ToString(),
+                    Url = reader["url"].ToString(),
+                    Year = Convert.ToInt32(reader["year"]),
+                    ReleaseDate = Convert.ToDateTime(reader["releaseDate"]),
+                    Language = reader["language"].ToString(),
+                    Budget = Convert.ToDouble(reader["budget"]),
+                    GrossWorldwide = Convert.ToDouble(reader["grossWorldwide"]),
+                    Genres = reader["genres"].ToString(),
+                    IsAdult = Convert.ToBoolean(reader["isAdult"]),
+                    RuntimeMinutes = Convert.ToInt32(reader["runtimeMinutes"]),
+                    AverageRating = Convert.ToSingle(reader["averageRating"]),
+                    NumVotes = Convert.ToInt32(reader["numVotes"]),
+                    StartRentDate = Convert.ToDateTime(reader["startRentDate"]),
+                    EndRentDate = Convert.ToDateTime(reader["endRentDate"]),
+                    RentalCount = Convert.ToInt32(reader["rentalCount"]),
+                    PriceToRent = Convert.ToInt32(reader["priceToRent"]),
+                };
+                movies.Add(movie);
+            }
+            return movies;
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                reader.Close();
+            }
+            if (con != null)
+            {
+                con.Close();
+            }
+        }
+    }
+
     //--------------------------------------------------------------------------------------------------
     // This method rents a movie for the user 
     //--------------------------------------------------------------------------------------------------
-    public int RentMovie(int userId, int movieId,DateOnly rentStart,DateOnly rentEnd,int totalPrice)
+    public int RentMovie(int userId, int movieId,DateTime rentStart,DateTime rentEnd,int totalPrice)
     {
         SqlConnection con;
         SqlCommand cmd;
@@ -58,7 +129,7 @@ public class DBservices
         paramDic.Add("@rentStart", rentStart);
         paramDic.Add("@rentEnd", rentEnd);
         paramDic.Add("@totalPrice", totalPrice);
-        cmd = CreateCommandWithStoredProcedureGeneral("SP_Movies2025_RentMovie", con, paramDic);         // create the command
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_RentMovie2025", con, paramDic);         // create the command
         try
         {
             int numEffected = cmd.ExecuteNonQuery(); // execute the command

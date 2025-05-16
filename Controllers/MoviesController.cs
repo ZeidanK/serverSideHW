@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ServerSide_HW.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -119,5 +120,61 @@ namespace ServerSide_HW.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        public class RentMovieRequest
+        {
+            public int MovieID { get; set; }
+            public int RentalDays { get; set; }
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+            public int TotalPrice { get; set; }
+        }
+
+
+        [HttpPost("rentMovie")]
+        [Authorize]
+        public ActionResult<bool> RentMovie([FromBody] RentMovieRequest request)
+        {
+            var userId = GetUserIdFromToken();
+            if (userId == null)
+                return Unauthorized("User ID not found in token");
+            try
+            {
+                DBservices dbServices = new DBservices();
+                var result = dbServices.RentMovie(userId.Value,request.MovieID,request.StartDate,request.EndDate,request.TotalPrice);
+                //movie.UserId = userId.Value; // Assign userId to the movie
+                return Ok(result);   // Use instance method
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("rentedMovies")]
+        [Authorize]
+        public ActionResult<IEnumerable<Movie>> GetRentedMovies()
+        {
+            var userId = GetUserIdFromToken();
+            try
+            {
+                DBservices dbServices = new DBservices();
+                var result = dbServices.GetRentedMovies(userId.Value);
+                if (result == null || result.Count == 0)
+                {
+                    return NotFound("No rented movies found.");
+                }
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return BadRequest(e.Message);
+
+            }
+        }
+
+
     }
 }

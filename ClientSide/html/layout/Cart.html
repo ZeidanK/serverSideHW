@@ -132,43 +132,10 @@
         }
         
         // Button click event to search by title
-$('#search-title-btn').on('click', function() {
-    const title = $('#title-search').val().trim();
-    if (title) {
-        searchMoviesByTitle(title);
-    } else {
-        $.notify('Please enter a title to search');
-        //showNotification('Operation successful!', 'success');
-    }
-});
-
-// Button click event to search by date range
-$('#search-date-btn').on('click', function() {
-    const startDate = $('#start-date').val();
-    const endDate = $('#end-date').val();
-    
-    if (startDate && endDate) {
-        if (new Date(startDate) > new Date(endDate)) {
-            $.notify('Start date must be before end date');
-        } else {
-            searchMoviesByDateRange(startDate, endDate);
-        }
-    } else {
-        $.notify('Please select both start and end dates');
-    }
-});
-
-// Button click event to reset filters
-$('#reset-filters-btn').on('click', function() {
-    $('#title-search').val('');
-    $('#start-date').val('');
-    $('#end-date').val('');
-    MovieUtils.initMyMoviesPage();
-});
 
 // Button click event to load all movies
 $('#loadMoviesBtn').on('click', function() {
-    MovieUtils.initMyMoviesPage();
+    MovieUtils.initCartPage();
 });
 
 // Listen for successful authentication
@@ -176,13 +143,13 @@ document.addEventListener('auth:success', function(e) {
     console.log("Auth success event received, user:", e.detail.user);
     
     // Initialize page content only after authentication is confirmed
-    MovieUtils.initMyMoviesPage();
+    MovieUtils.initCartPage();
 });
 
 $(document).ready(function() {
     // Call the function to load movies when document is ready
     //checkAccess();
-    MovieUtils.initMyMoviesPage();
+    MovieUtils.initCartPage();
 });
 
 
