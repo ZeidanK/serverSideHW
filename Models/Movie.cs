@@ -20,12 +20,14 @@
         int priceToRent;
         int rentalCount;
         int userId; // a way to save added movies for each user independently  
+        DateTime startRentDate;
+        DateTime endRentDate;
 
         static Dictionary<int, List<Movie>> UserMovies = new(); 
 
         public Movie() {}
 
-        public Movie(int id, string url, string primaryTitle, string description, string primaryImage, int year, DateTime releaseDate, string language, double budget, double grossWorldwide, string genres, bool isAdult, int runtimeMinutes, float averageRating, int numVotes)
+        public Movie(int id, string url, string primaryTitle, string description, string primaryImage, int year, DateTime releaseDate, string language, double budget, double grossWorldwide, string genres, bool isAdult, int runtimeMinutes, float averageRating, int numVotes,DateTime startRentDate,DateTime endRentDate)
         {
             this.id = id;
             this.url = url;
@@ -42,6 +44,8 @@
             this.runtimeMinutes = runtimeMinutes;
             this.averageRating = averageRating;
             this.numVotes = numVotes;
+            this.startRentDate = startRentDate;
+            this.endRentDate = endRentDate;
         }
 
         public int Id { get => id; set => id = value; }
@@ -63,6 +67,8 @@
 
         public int PriceToRent { get => priceToRent; set => priceToRent = value; }
         public int RentalCount { get => rentalCount; set => rentalCount = value; }
+        public DateTime StartRentDate { get => startRentDate; set => startRentDate = value; }
+        public DateTime EndRentDate { get => endRentDate; set => endRentDate = value; }
         public bool Insert()
         {
             try
