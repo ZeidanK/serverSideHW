@@ -1,0 +1,61 @@
+{
+  "getUsers": {
+    "status": "success",
+    "data": [
+      {
+        "id": 1,
+        "email": "john.doe@example.com",
+        "userName": "johndoe",
+        "firstName": "John",
+        "lastName": "Doe",
+        "birthDate": "1990-01-15T08:00:00Z",
+        "userRegisteredSince": "2023-01-01T10:30:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": 2,
+        "email": "jane.smith@example.com",
+        "userName": "janesmith",
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "birthDate": "1985-05-20T14:00:00Z",
+        "userRegisteredSince": "2022-11-10T09:00:00Z",
+        "deletedAt": "2023-08-15T12:00:00Z"
+      },
+      {
+        "id": 3,
+        "email": "alice.w@example.com",
+        "userName": "alicew",
+        "firstName": "Alice",
+        "lastName": "Wonderland",
+        "birthDate": "1995-07-03T10:15:00Z",
+        "userRegisteredSince": "2023-03-01T12:00:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": 4,
+        "email": "bob.builder@example.com",
+        "userName": "bobthebuilder",
+        "firstName": "Bob",
+        "lastName": "Builder",
+        "birthDate": "1978-11-30T16:45:00Z",
+        "userRegisteredSince": "2021-05-15T18:30:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": 5,
+        "email": "charlie.b@example.com",
+        "userName": "charlieb",
+        "firstName": "Charlie",
+        "lastName": "Brown",
+        "birthDate": "2000-02-29T09:00:00Z",
+        "userRegisteredSince": "2023-09-01T11:00:00Z",
+        "deletedAt": "2024-01-10T09:00:00Z"
+      }
+    ]
+  },
+  "updateUserStatus": {
+    "status": "success",
+    "message": "User status updated successfully (mocked)."
+  }
+}
