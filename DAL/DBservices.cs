@@ -80,8 +80,8 @@ public class DBservices
                     RuntimeMinutes = Convert.ToInt32(reader["runtimeMinutes"]),
                     AverageRating = Convert.ToSingle(reader["averageRating"]),
                     NumVotes = Convert.ToInt32(reader["numVotes"]),
-                    StartRentDate = Convert.ToDateTime(reader["startRentDate"]),
-                    EndRentDate = Convert.ToDateTime(reader["endRentDate"]),
+                    StartRentDate = Convert.ToDateTime(reader["rentStart"]),
+                    EndRentDate = Convert.ToDateTime(reader["rentEnd"]),
                     RentalCount = Convert.ToInt32(reader["rentalCount"]),
                     PriceToRent = Convert.ToInt32(reader["priceToRent"]),
                 };
