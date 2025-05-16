@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Text;
 using ServerSide_HW.Models;
+using System.ComponentModel.Design;
 
 /// <summary>
 /// DBServices is a class created by me to provides some DataBase Services
@@ -101,6 +102,7 @@ public class DBservices
         paramDic.Add("@email", user.Email);
         paramDic.Add("@userName", user.Name);
         paramDic.Add("@password", user.Password);
+        paramDic.Add("@active", true);
         
 
 
@@ -226,6 +228,85 @@ public class DBservices
 
         return cmd;
     }
+    public int ChangeUserSatus(int id)
+    {
+        SqlConnection con;
+        SqlCommand cmd;
+        SqlDataReader reader= null;
+        try
+        {
+            con = connect("myProjDB"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_Users2025_Get", con, null); // create the command
+
+
+
+        return 0;
+    }
+    public (List<User>, int) GetAllUsers()
+    {
+        SqlConnection con;
+        SqlCommand cmd;
+        SqlDataReader reader = null;
+        List<User> users = new List<User>();
+        int totalCount = 0;
+        try
+        {
+            con = connect("myProjDB"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_Users2025_Get", con,null); // create the command
+        try
+        {
+            reader = cmd.ExecuteReader();
+            // Read users
+            while (reader.Read())
+            {
+                User user = new User
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    Name = reader["userName"].ToString(),
+                    Email = reader["email"].ToString(),
+                    Password = reader["password"].ToString(),
+                    Active = reader["active"] != DBNull.Value && Convert.ToBoolean(reader["active"])
+                };
+                users.Add(user);
+            }
+            // Move to the next result set to get the total count
+            if (reader.NextResult() && reader.Read())
+            {
+                totalCount = Convert.ToInt32(reader["totalCount"]);
+            }
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                reader.Close();
+            }
+            if (con != null)
+            {
+                con.Close();
+            }
+        }
+        return (users, totalCount);
+    }
     //--------------------------------------------------------------------------------------------------
     // This method searches for movies with filters and pagination
     //--------------------------------------------------------------------------------------------------
@@ -340,6 +421,7 @@ public class DBservices
            { "@id", id.HasValue ? id.Value : DBNull.Value },
            { "@userName", string.IsNullOrEmpty(userName) ? DBNull.Value : userName },
            { "@Email", string.IsNullOrEmpty(email) ? DBNull.Value : email }
+           
        };
 
         cmd = CreateCommandWithStoredProcedureGeneral("sp_Users2025_Get", con, paramDic); // create the command  
@@ -356,7 +438,7 @@ public class DBservices
                     Name = reader["userName"].ToString(),
                     Email = reader["email"].ToString(),
                     Password = reader["password"].ToString(),
-                    Active = false
+                    Active = Convert.ToBoolean(reader["active"]),
                 };
             }
         }
@@ -406,7 +488,8 @@ public class DBservices
            { "@firstName", DBNull.Value }, // Assuming firstName is not part of the User class  
            { "@lastName", DBNull.Value },  // Assuming lastName is not part of the User class  
            { "@password", string.IsNullOrEmpty(user.Password) ? DBNull.Value : user.Password },
-           { "@birthDate", DBNull.Value }  // Assuming birthDate is not part of the User class  
+           { "@birthDate", DBNull.Value },  // Assuming birthDate is not part of the User class
+           { "@active", user.Active }
        };
 
         cmd = CreateCommandWithStoredProcedureGeneral("sp_Users2025_Update", con, paramDic); // create the command  

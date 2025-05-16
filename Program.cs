@@ -84,7 +84,7 @@ if (true)
 app.UseHttpsRedirection();
 // Replace your current CORS configuration with this:
 app.UseCors(policy => policy
-    .WithOrigins("http://127.0.0.1:5501", "http://localhost:5501") // Add your frontend origins
+    .SetIsOriginAllowed(origin => true) // Allow any origin dynamically
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()); // This is critical for Authorization headers
