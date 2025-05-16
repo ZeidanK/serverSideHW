@@ -20,8 +20,8 @@ class Movie {
         this.numVotes = numVotes;
         this.priceToRent = priceToRent;
         this.rentalCount = rentalCount;
-        this.rentEndDate = null;
-        this.rentStartDate = null;
+        this.rentEndDate = rentEndDate;
+        this.rentStartDate = rentStartDate;
     }
 }
 
@@ -81,7 +81,7 @@ const MovieUtils = {
         return Number(num || 0).toLocaleString();
     },
 
-    createCardContent: function(movieInstance,cart=false) {
+    createCardContent: function(movieInstance,cart=0) {
         const content = $('<div>').addClass('movie-content');
         content.append($('<div>').addClass('movie-title').text(movieInstance.title));
         content.append($('<div>').addClass('movie-info').html('<strong>Year:</strong> ' + (movieInstance.year || 'N/A')));
@@ -89,6 +89,13 @@ const MovieUtils = {
         content.append($('<div>').addClass('movie-rating').html('<strong>Rating:</strong> ' + movieInstance.averageRating));
         if(cart){
             content.append($('<div>').addClass('movie-info').html('<strong>Rental Count:</strong> ' + this.formatNumber(movieInstance.rentalCount)));
+            if(cart==2){
+                console.log(movieInstance);
+                content.append($('<div>').addClass('movie-info').html('<strong>Rental Start Date:</strong> ' + this.formatDate(movieInstance.rentStartDate)));
+                content.append($('<div>').addClass('movie-info').html('<strong>Rental End Date:</strong> ' + this.formatDate(movieInstance.rentEndDate)));
+                console.log(movieInstance.rentStartDate);
+                console.log(movieInstance.rentEndDate);
+            }
            // content.append($('<div>').addClass('movie-info').html('<strong>Rental Start Date:</strong> ' + this.formatDate(movieInstance.rentStartDate)));
            // content.append($('<div>').addClass('movie-info').html('<strong>Rental End Date:</strong> ' + this.formatDate(movieInstance.rentEndDate)));
             content.append($('<div>').addClass('movie-info').html('<strong>Price To Rent:</strong> $' + this.formatNumber(movieInstance.priceToRent)));
@@ -103,7 +110,7 @@ const MovieUtils = {
             ' | <strong>Votes:</strong> ' + this.formatNumber(movieInstance.numVotes)
             
         );
-        if (cart) {
+        if (cart==1) {
             footer.append(this.createDeleteButton(movieInstance));
 
         }
@@ -248,6 +255,7 @@ const MovieUtils = {
         
         return rentBtn;
         },
+
         createDeleteButton: function(movieInstance) {
         const deleteBtn = $('<button>').addClass('delete-movie-btn').text('remove from cart').css({
             backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 15px',
@@ -382,8 +390,11 @@ const MovieUtils = {
             movie.year || movie.startYear, movie.releaseDate, movie.language,
             movie.budget, movie.grossWorldwide, movie.genres,
             movie.isAdult, movie.runtimeMinutes, movie.averageRating, movie.numVotes,
-            movie.priceToRent, movie.rentalCount, movie.rentEndDate, movie.rentStartDate
+            movie.priceToRent, movie.rentalCount, movie.endRentDate, movie.startRentDate
         );
+        console.log('movieInstance');
+        console.log(movieInstance);
+        console.log(movie);
 
         const card = $('<div>').addClass('movie-card');
         if (movieInstance.image) {
@@ -391,7 +402,7 @@ const MovieUtils = {
             card.append(img);
         }
 
-        const content = this.createCardContent(movieInstance);
+        const content = this.createCardContent(movieInstance,isMyMovies?2:0);
         isMyMovies ? content.append(this.createTransferButton(movieInstance)) : content.append(this.createAddButton(movieInstance, index));
         card.append(content);
         return card;
@@ -416,6 +427,7 @@ const MovieUtils = {
     },
 
     displayMovies: function(movies, container, isMyMovies = false) {
+        console.log(movies);
         container.empty();
         let CartCount =0;
         if (movies && movies.length > 0) {
@@ -442,6 +454,16 @@ const MovieUtils = {
         );
     },
 
+    loadServerRentedMovies: function() {
+        const container = $('#movies-container');
+        container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Loading your rented movies...</div>');
+
+        MovieUtils.ajaxCall("GET", "/api/movies/rentedMovies", null,
+            data => MovieUtils.displayMovies(data, container, true),
+            MovieUtils.showErrorMessage
+        );
+    },
+
     initIndexPage: function () {
         const container = $('#movies-container');
         container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Loading movies...</div>');
@@ -461,7 +483,7 @@ const MovieUtils = {
         const container = $('#movies-container');
         container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Loading your movies...</div>');
 
-        MovieUtils.ajaxCall("GET", "/api/movies", null,
+        MovieUtils.ajaxCall("GET", "/api/movies/rentedMovies", null,
             data => MovieUtils.displayMovies(data, container, true),
             MovieUtils.showErrorMessage
         );
@@ -472,7 +494,7 @@ const MovieUtils = {
         container.html('<div style="grid-column: 1/-1; text-align: center; padding: 20px;">Loading your cart...</div>');
 
         MovieUtils.ajaxCall("GET", "/api/movies", null,
-            data => MovieUtils.displayMoviesCart(data, container, true),
+            data => MovieUtils.displayMoviesCart(data, container, 1),
             MovieUtils.showErrorMessage
         );
     }
