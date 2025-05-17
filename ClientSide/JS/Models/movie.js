@@ -329,13 +329,17 @@ const MovieUtils = {
                 // Build payload for the transfer API
                 const payload = {
                     movieId: movieInstance.id,
-                    recipientEmail: recipientEmail
+                    recipientEmail: recipientEmail,
+                    movieRentStartDate: movieInstance.rentStartDate,
                 };
                 // Adjust the endpoint as needed
-                MovieUtils.ajaxCall("POST", "/api/movies/transfer", JSON.stringify(payload),
+                MovieUtils.ajaxCall("POST", "/api/Users/TransferMovie", JSON.stringify(payload),
                     function(resp) {
                         $.notify("Rental transferred successfully!", "success");
                         transferModal.remove();
+                        MovieUtils.loadServerRentedMovies();
+                        //initMyMoviesPage();
+                        //console.log("is this working?");
                     },
                     function(err) {
                         $.notify(err.responseJSON?.message || "Transfer failed.", "error");

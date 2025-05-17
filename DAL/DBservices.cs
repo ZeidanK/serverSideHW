@@ -152,6 +152,48 @@ public class DBservices
 
 
     //--------------------------------------------------------------------------------------------------
+    // This method transfers a rented movie from one user to another
+    //--------------------------------------------------------------------------------------------------
+
+    public int TransferMovie(int oldUserId, int newUserId, int movieId, DateTime rentStart)
+    {
+        SqlConnection con;
+        SqlCommand cmd;
+        try
+        {
+            con = connect("myProjDB"); // create the connection
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@userId", oldUserId);
+        paramDic.Add("@movieId", movieId);
+        paramDic.Add("@newUserId", newUserId);
+        paramDic.Add("@rentStart", rentStart);
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_TransferRentMovie2025", con, paramDic);         // create the command
+        try
+        {
+            int numEffected = cmd.ExecuteNonQuery(); // execute the command
+            return numEffected;
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+    }
+    //--------------------------------------------------------------------------------------------------
     // This method inserts a movie into the movies table 
     //--------------------------------------------------------------------------------------------------
     public int Insert(User user)
