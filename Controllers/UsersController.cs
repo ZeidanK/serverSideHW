@@ -257,64 +257,6 @@ namespace ServerSide_HW.Controllers
             return StatusCode(500, "An error occurred while updating the profile.");
         }
 
-        // Define a request model to encapsulate both the updated user and the password
-        //public class UpdateProfileRequest
-        //{
-        //    public User UpdatedUser { get; set; }
-        //    public string Password { get; set; }
-        //}
-        //{
-        //    if (updatedUser == null)
-        //    {
-        //        return BadRequest("Invalid user data.");
-        //    }
-
-        //    // Extract user ID from JWT token
-        //    var userID = GetUserIdFromToken();
-        //    if (userID == null)
-        //    {
-        //        return Unauthorized("Invalid token.");
-        //    }
-
-        //    DBservices dBservices = new DBservices();
-        //    var existingUser = dBservices.GetUser(null, userID, null);
-
-        //    if (existingUser == null)
-        //    {
-        //        return NotFound("User not found.");
-        //    }
-
-        //    // Verify the provided password matches the current user's password
-        //    var hashedPassword = Models.User.HashPassword(password);
-        //    if (existingUser.Password != hashedPassword)
-        //    {
-        //        return Unauthorized("Incorrect password.");
-        //    }
-
-        //    // Update user details based on provided values
-        //    if (updatedUser.Name != "-1")
-        //    {
-        //        existingUser.Name = updatedUser.Name;
-        //    }
-        //    if (updatedUser.Email != "-1")
-        //    {
-        //        existingUser.Email = updatedUser.Email;
-        //    }
-        //    if (updatedUser.Password != "-1")
-        //    {
-        //        existingUser.Password = Models.User.HashPassword(updatedUser.Password);
-        //    }
-
-        //    // Save the updated user to the database
-        //    int result = dBservices.UpdateUser(existingUser);
-
-        //    if (result > 0)
-        //    {
-        //        return Ok(new { message = "Profile updated successfully." });
-        //    }
-
-        //    return StatusCode(500, "An error occurred while updating the profile.");
-        //}
 
 
 
@@ -376,6 +318,63 @@ namespace ServerSide_HW.Controllers
                 AllHeaders = Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString())
             });
         }
+        [HttpPost("TransferMovie")]
+        [Authorize]
+        public IActionResult TransferMovie([FromBody] TransferMovieRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.RecipientEmail) || request.MovieId <= 0 || request.MovieRentStartDate == default)
+            {
+                return BadRequest(new { message = "Invalid transfer data." });
+            }
 
+            // Get current user ID from JWT token
+            var oldUserId = GetUserIdFromToken();
+            if (oldUserId == null)
+            {
+                return Unauthorized(new { message = "Invalid token." });
+            }
+
+            DBservices db = new DBservices();
+            // Get recipient user by email
+            var recipientUser = db.GetUser(request.RecipientEmail);
+            if (recipientUser == null)
+            {
+                return NotFound(new { message = "Recipient user not found." });
+            }
+            List<Movie> rentedMovies = db.GetRentedMovies(recipientUser.Id);
+            bool alreadyRented = rentedMovies.Any(m => m.Id == request.MovieId);
+            if (alreadyRented)
+            {
+                return BadRequest(new { message = "Recipient already has this movie rented." });
+            }
+
+            try
+            {
+                int result = db.TransferMovie(oldUserId.Value, recipientUser.Id, request.MovieId, DateTime.Parse(request.MovieRentStartDate));
+                if (result > 0)
+                {
+                    return Ok(new { message = "Rental transferred successfully!" });
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "Transfer failed." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+
+
+    }
+
+    // DTO for transfer request
+    public class TransferMovieRequest
+    {
+        public int MovieId { get; set; }
+        public string RecipientEmail { get; set; }
+        public string MovieRentStartDate { get; set; }
     }
 }
