@@ -6,6 +6,11 @@
 // // These imports rely on the UMD builds attaching to window.jQuery
 // import 'datatables.net';
 // import 'datatables.net-bs5';
+
+const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const port = isLocalhost ? "7026" : "";
+const address = isLocalhost ? "https://localhost:" : "https://proj.ruppin.ac.il/cgroup4/test2/tar1";
+const apiUrl = `${address}${port}/api/Users`;
 function ajaxCall(method, api, data, successCB, errorCB) {
   $.ajax({
       type: method,
@@ -20,7 +25,7 @@ function ajaxCall(method, api, data, successCB, errorCB) {
 }
 async function fetchUsers() {
   return new Promise((resolve, reject) => {
-    ajaxCall("GET", "https://localhost:7026/api/Users", null,
+    ajaxCall("GET", apiUrl, null,
       function (response) {
         console.log(response);
         resolve(response || []);
@@ -34,11 +39,11 @@ async function fetchUsers() {
 }
 
 async function fetchUsers1() {
-  ajaxCall("GET", "https://localhost:7026/api/Users",null,function(response) {
+  ajaxCall("GET", apiUrl, null, function (response) {
     console.log(response);
     return response || [];
-  },function(error) {
-    console.log(error);
+  }, function (error) {
+    console.error(error);
   });
 }
 // Function to fetch user data from the mock API
@@ -127,7 +132,7 @@ console.log(JSON.stringify(userData));
     // Toggle active status
     ajaxCall(
       "PUT",
-      `https://localhost:7026/api/Users/UpdateUserStatus`,
+      `${apiUrl}/UpdateUserStatus`,
       JSON.stringify(userData),
       function (response) {
         console.log("User status updated successfully:", response);
