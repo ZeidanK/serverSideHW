@@ -31,7 +31,7 @@ const MOVIE_GENRES = [
     "Mystery", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western"
 ];
 window.MOVIE_GENRES = MOVIE_GENRES;
-const isLocalhost = window.location.hostname === "localhost";
+const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 const port = isLocalhost ? "7026" : "";
 const address = isLocalhost ? "https://localhost:" : "https://proj.ruppin.ac.il/cgroup4/test2/tar1";
 

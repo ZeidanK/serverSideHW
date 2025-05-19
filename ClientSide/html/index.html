@@ -9,9 +9,9 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"></script>
 
-      <link rel="stylesheet" href="../../CSS/Styles.css">
-      <link rel="stylesheet" href="../../CSS/moviesCard.css">
-      <script src="../../JS/layout/notify.min.js"></script>
+      <link rel="stylesheet" href="../CSS/Styles.css">
+      <link rel="stylesheet" href="../CSS/moviesCard.css">
+      <script src="../JS/layout/notify.min.js"></script>
       <script src="../JS/Models/movie.js"></script>
       <script src="../JS/layout/Header.js"></script>
     <title>Search Movies</title>
@@ -125,9 +125,14 @@
             queryParams.append("pageNumber", currentPage);
             queryParams.append("pageSize", pageSize);
 
+
+            const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const port = isLocalhost ? "7026" : "";
+const address = isLocalhost ? "https://localhost:" : "https://proj.ruppin.ac.il/cgroup4/test2/tar1";
+
             $.ajax({
                 type: "GET",
-                url: `https://localhost:7026/api/Movies/search?${queryParams.toString()}`,
+                url: `${address}${port}/api/Movies/search?${queryParams.toString()}`,
                 contentType: "application/json",
                 success: function(response) {
                     console.log("API Response:", response);

@@ -2,6 +2,15 @@
 
 This is a .NET 6.0 project designed to handle server-side functionality. It includes JWT authentication, routing, and other features. Below are the instructions for setting up and running the project, including the backend, frontend, and database.
 
+
+## Home page
+https://proj.ruppin.ac.il/cgroup4/test2/tar3/ClientSide/html/index.html
+
+## Admin page No Auth 
+https://proj.ruppin.ac.il/cgroup4/test2/tar3/ClientSide/admin/index.html
+
+## Swagger API
+https://proj.ruppin.ac.il/cgroup4/test2/tar1/swagger/index.html
 ---
 
 ## Prerequisites
