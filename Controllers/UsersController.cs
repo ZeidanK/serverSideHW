@@ -341,6 +341,10 @@ namespace ServerSide_HW.Controllers
             {
                 return NotFound(new { message = "Recipient user not found." });
             }
+            if(recipientUser.Active == false)
+            {
+                return BadRequest(new { message = "Recipient user is not active." });
+            }
             List<Movie> rentedMovies = db.GetRentedMovies(recipientUser.Id);
             bool alreadyRented = rentedMovies.Any(m => m.Id == request.MovieId);
             if (alreadyRented)
