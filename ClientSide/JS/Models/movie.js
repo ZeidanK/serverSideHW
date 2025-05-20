@@ -442,7 +442,7 @@ const MovieUtils = {
         } else {
             container.html('<div style="grid-column: 1/-1; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">No movie data available.</div>');
         }
-        localStorage.setItem('CartCount', CartCount);
+        //localStorage.setItem('CartCount', CartCount);
     },
 
     loadServerMovies: function() {

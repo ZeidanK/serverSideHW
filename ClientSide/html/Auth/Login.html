@@ -68,7 +68,9 @@
                         console.log(response);
                         if (response.Token) {
                             localStorage.setItem('jwtToken', response.Token);
-
+                            console.log('Token received:', response.Token);
+                            console.log('cart size:', response.CartSize);
+                            localStorage.setItem("CartCount", parseInt(response.CartSize));
                             setTimeout(function () {
                                 window.location.href = '../index.html'; // Redirect after login
                             }, 2000); // 2-second delay

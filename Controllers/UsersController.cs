@@ -138,11 +138,13 @@ namespace ServerSide_HW.Controllers
             {
                 return Unauthorized("Invalid password.");
             }
-
+            List<Movie> Cart = Movie.Read(existingUser.Id);
+            // get number of movies in list
+            int CartSize = Movie.Read(existingUser.Id)?.Count ?? 0;
             // Generate JWT token
             var Token = GenerateJwtToken(existingUser);
 
-            return Ok(new Dictionary<string, string> { { "Token", Token } });
+            return Ok(new Dictionary<string, string> { { "Token", Token }, { "CartSize", CartSize.ToString() } });
         }
 
         private readonly IConfiguration _config;
